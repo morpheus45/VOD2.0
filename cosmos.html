@@ -6,11 +6,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1920,initial-scale=1,user-scalable=no">
 <script>
-// Scale universel : adapte le contenu 1920x1080 a TOUTE resolution TV
+// Scale universel : adapte le contenu 1920x1080 a TOUTE resolution TV.
+// On se base sur le VIEWPORT DE LAYOUT (clientWidth/Height fixé par le meta
+// width=1920), PAS sur screen.width : sur les TV à densité ×2 (ex Freebox POP,
+// screen.width=960) screen.width réduisait #app de moitié → bande noire à droite.
 (function(){
-  var sw=screen.width||window.innerWidth||1920;
-  var sh=screen.height||window.innerHeight||1080;
-  // Detecter densites particulieres (4K android override, etc.)
+  var de=document.documentElement;
+  var sw=de.clientWidth||window.innerWidth||screen.width||1920;
+  var sh=de.clientHeight||window.innerHeight||screen.height||1080;
   var scale=Math.min(sw/1920, sh/1080);
   if(scale<0.99||scale>1.01){
     var s=document.createElement('style');

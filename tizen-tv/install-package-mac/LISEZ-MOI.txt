@@ -1,0 +1,83 @@
+╔═══════════════════════════════════════════════════════════════╗
+║           PIPSILY TV — Application Samsung Smart TV           ║
+║              Guide d'installation — macOS / Apple             ║
+╚═══════════════════════════════════════════════════════════════╝
+
+── CONTENU DU PACKAGE ──────────────────────────────────────────
+
+  INSTALLER.command      ← Double-cliquer ici pour installer
+  PIPSILY-TV-signed.wgt  ← L'application Samsung TV
+  sdb/sdb                ← Outil de connexion Samsung (inclus)
+  LISEZ-MOI.txt          ← Ce fichier
+
+── PRÉREQUIS ───────────────────────────────────────────────────
+
+  ✓ TV Samsung Smart TV (2016 ou plus récente, Tizen 3.0+)
+  ✓ TV et Mac sur le même réseau Wi-Fi
+  ✓ macOS 12 Monterey ou plus récent
+
+── INSTALLATION EN 3 ÉTAPES ────────────────────────────────────
+
+  ÉTAPE 1 — Activer le mode développeur sur la TV
+  ─────────────────────────────────────────────────
+  1. Sur ta télécommande Samsung : touche Accueil
+  2. Paramètres (⚙) → Support → À propos de ce TV
+  3. Clique 5 fois sur le NUMÉRO DE MODÈLE affiché à l'écran
+  4. Un dialogue "Mode développeur" apparaît → Sélectionner ON
+  5. Entrer l'adresse IP de ton Mac
+     (Menu Apple → Réglages Système → Wi-Fi → Détails → Adresse IP)
+  6. Confirmer → la TV redémarre
+
+  ÉTAPE 2 — Trouver l'IP de ta TV
+  ─────────────────────────────────
+  Sur la TV : Paramètres → Général → Réseau → État du réseau
+              → Informations IP
+  Note l'adresse (exemple : 192.168.1.50)
+
+  ÉTAPE 3 — Lancer l'installateur
+  ─────────────────────────────────
+  1. Double-cliquer sur INSTALLER.command
+  2. Si macOS demande confirmation → cliquer Ouvrir
+  3. Suivre les instructions dans le Terminal
+  4. Entrer l'adresse IP de la TV quand demandé
+  5. L'application s'installe et se lance automatiquement !
+
+── ASTUCE macOS — Si le fichier ne s'ouvre pas ─────────────────
+
+  macOS peut bloquer le script pour "sécurité".
+  Solution : clic droit sur INSTALLER.command → Ouvrir → Ouvrir
+
+  Si Terminal affiche "permission refusée" :
+  1. Ouvrir Terminal (Applications → Utilitaires → Terminal)
+  2. Taper : chmod +x  puis glisser INSTALLER.command dans la fenêtre
+  3. Appuyer sur Entrée, puis relancer INSTALLER.command
+
+── MISES À JOUR AUTOMATIQUES ───────────────────────────────────
+
+  Une fois installée, PIPSILY TV se met à jour automatiquement
+  à chaque lancement — aucune action requise.
+
+── DÉSINSTALLATION ─────────────────────────────────────────────
+
+  TV : Applications → ⚙ (paramètres) → PIPSILY → Supprimer
+
+── PROBLÈMES FRÉQUENTS ─────────────────────────────────────────
+
+  "Connexion refusée" ou "Connection refused"
+  → Mode développeur non activé ou TV non redémarrée
+  → Vérifier que TV et Mac sont sur le même Wi-Fi
+
+  "sdb: Permission denied"
+  → Ouvrir Terminal, taper : chmod +x [glisser sdb/sdb ici]
+
+  "Certificat invalide"
+  → Redémarrer la TV en mode développeur et réessayer
+
+  L'app ne se trouve pas dans le menu TV
+  → Chercher dans Applications → Mes applications
+
+── CONTACT ─────────────────────────────────────────────────────
+
+  GitHub : https://github.com/morpheus45/VOD
+
+═══════════════════════════════════════════════════════════════

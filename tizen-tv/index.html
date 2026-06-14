@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Lecteur IPTV pour films et séries" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PIPSILY" />
+  <meta name="application-name" content="PIPSILY" />
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
+  <title>PIPSILY TV</title>
+  <link rel="icon" href="./icons/icon-192.png" type="image/png" />
+
+  <!-- API Tizen native — placeholder remplacé automatiquement par Tizen Studio au packaging -->
+  <script src="$TIZEN_SCRIPT"></script>
+
+  <!-- Auto-update Tizen (chargé en premier) -->
+  <script src="tizen-update.js"></script>
+
+  <!-- Adaptations télécommande Samsung TV -->
+  <script src="tizen-tv.js"></script>
+
+  <link rel="stylesheet" href="styles.css?v=97" />
+
+  <script>
+    /* Sur Tizen packagé on est toujours en TV — sans condition */
+    document.documentElement.classList.add('is-tv');
+  </script>
+</head>
+<body>
+  <div class="app-shell">
+
+    <header class="topbar">
+      <div class="topbar-brand-row">
+        <img src="./logo.svg" alt="PIPSILY" class="brand-logo" />
+        <div class="topbar-user-btns" id="topbarUserBtns" style="display:none">
+          <a href="./admin.html"   class="user-btn user-btn--admin" id="adminBtn"   style="display:none">⚙ Admin</a>
+          <a href="./account.html" class="user-btn user-btn--account" id="accountBtn">👤</a>
+        </div>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn active" data-type="vod">🎬 Films</button>
+        <button class="nav-btn"        data-type="series">📺 Séries</button>
+        <button class="nav-btn"        data-type="live">📡 TV</button>
+      </div>
+    </header>
+
+    <section class="sticky-controls">
+      <div class="controls-grid controls-grid--four">
+        <select id="categorySelect">
+          <option value="">Toutes les catégories</option>
+        </select>
+        <input  id="searchInput"   type="text" placeholder="Rechercher un titre…" autocomplete="off" />
+        <div id="qualityPills" class="quality-pills">
+          <button class="quality-pill quality-pill--active" data-q="">Tout</button>
+          <button class="quality-pill" data-q="4K">4K</button>
+          <button class="quality-pill" data-q="HD">HD</button>
+          <button class="quality-pill" data-q="SD">SD</button>
+          <button class="quality-pill" data-q="Autres">Autres</button>
+          <button class="quality-pill fav-pill" id="favFilterBtn">❤️ Favoris</button>
+        </div>
+        <select id="sortSelect">
+          <option value="title">Titre A→Z</option>
+          <option value="category">Catégorie</option>
+          <option value="recent">Récents</option>
+        </select>
+      </div>
+    </section>
+
+    <main class="content">
+
+      <div id="catPills" class="cat-pills" hidden></div>
+
+      <section class="hero" id="hero">
+        <div class="hero-text">
+          <h1 id="heroTitle">PIPSILY</h1>
+          <p id="heroSubtitle"></p>
+          <div class="hero-stats">
+            <span id="statCount"></span>
+          </div>
+        </div>
+      </section>
+
+      <section id="poursuivreSection" class="section-block" hidden>
+        <div class="section-title-row">
+          <h2 class="section-h2">▶ Poursuivre</h2>
+        </div>
+        <div id="poursuivreRow" class="nou-row"></div>
+      </section>
+
+      <section id="nouveautesSection" class="section-block" hidden>
+        <div class="section-title-row">
+          <h2 class="section-h2">🆕 Nouveautés</h2>
+          <span class="section-sub">Films récemment ajoutés</span>
+        </div>
+        <div id="nouveautesRow" class="nou-row"></div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-title-row">
+          <h2 id="catalogTitle">Catalogue</h2>
+          <span id="catalogCount">0 éléments</span>
+        </div>
+        <div id="grid" class="grid"></div>
+        <div id="gridSentinel" style="height:1px;margin-top:2rem;"></div>
+        <div id="emptyState" class="empty-state" hidden>Aucun élément trouvé.</div>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="seriesPanel" class="series-panel" hidden></div>
+
+  <!-- updateBar conservé dans le DOM (display:none) pour éviter les erreurs JS dans app.js -->
+  <div id="updateBar" class="update-bar" style="display:none" aria-hidden="true">
+    <div class="update-bar__left">
+      <span class="update-bar__icon">🔄</span>
+      <div class="update-bar__text">
+        <span class="update-bar__label">Catalogue</span>
+        <span class="update-bar__date" id="lastUpdateDate">Chargement…</span>
+      </div>
+    </div>
+    <button class="update-bar__btn" id="refreshCacheBtn" tabindex="-1">Mettre à jour</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       LECTEUR INTERNE — overlay plein écran
+       ═══════════════════════════════════════════════════════ -->
+  <div id="pip-player" role="dialog" aria-modal="true" aria-label="Lecteur vidéo">
+
+    <div class="pip-top">
+      <button id="pip-back" class="pip-icon-btn" type="button">← Retour</button>
+      <div class="pip-title-wrap">
+        <div id="pip-title" class="pip-title-text">Lecture</div>
+        <div id="pip-sub"   class="pip-sub-text"></div>
+      </div>
+      <button id="pip-fav" class="pip-icon-btn" type="button" aria-label="Favoris">♡</button>
+    </div>
+
+    <div class="pip-video-wrap">
+      <video id="pip-video" playsinline controls autoplay preload="metadata"></video>
+      <div id="pip-status" class="pip-status" hidden></div>
+    </div>
+
+    <div class="pip-ep-nav" id="pip-ep-nav" hidden>
+      <button id="pip-prev" class="pip-ep-btn" type="button" disabled>⏮ Épisode précédent</button>
+      <button id="pip-next" class="pip-ep-btn pip-ep-btn--next" type="button" disabled>Épisode suivant ⏭</button>
+    </div>
+
+    <div class="pip-actions">
+      <button id="pip-fullscreen" type="button">⛶ Plein écran</button>
+      <button id="pip-copy"       type="button">⎘ Copier le lien</button>
+      <button id="pip-native"     type="button" class="pip-btn-primary">▶ Lecture native</button>
+    </div>
+
+    <!-- Boutons iOS masqués sur TV -->
+    <div class="pip-ios-actions" id="pip-ios-actions" hidden></div>
+
+    <div class="pip-info">
+      <h2>Synopsis</h2>
+      <p id="pip-plot">Aucune description.</p>
+    </div>
+
+  </div>
+
+  <!-- HLS.js épinglé à 1.5.15 pour Tizen -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js"
+          onerror="console.warn('HLS.js CDN indisponible')"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="./auth.js"></script>
+  <script src="app.js?v=134"></script>
+
+  <!-- PAS de service worker : incompatible avec les apps Tizen packagées -->
+  <script>
+    window.addEventListener("load", () => {
+      if(typeof initTizenTV === "function") initTizenTV();
+      if(typeof initTizenUpdate === "function") initTizenUpdate();
+    });
+  </script>
+</body>
+</html>

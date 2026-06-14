@@ -1,0 +1,55 @@
+name: 🔄 Refresh IPTV Data
+
+on:
+  # Déclenchement manuel depuis GitHub → Actions → "Run workflow"
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Raison du refresh (optionnel)'
+        required: false
+        default: 'Refresh manuel'
+
+  # Automatique chaque lundi et jeudi à 3h UTC
+  schedule:
+    - cron: '0 3 * * 1,4'
+
+jobs:
+  refresh:
+    name: Refresh séries, films, live et M3U
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # Nécessaire pour le commit automatique
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ⚙️  Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🔄 Lancer le refresh
+        run: node scripts/refresh.js
+        env:
+          XTREAM_BASE: ${{ secrets.XTREAM_BASE }}
+          XTREAM_USER: ${{ secrets.XTREAM_USER }}
+          XTREAM_PASS: ${{ secrets.XTREAM_PASS }}
+
+      - name: 📤 Commit et push si changements
+        run: |
+          git config user.name  "PIPSIFLIX Bot"
+          git config user.email "bot@pipsiflix.local"
+          git add series.json vod.json live.json episodes_map.json episodes_index.json || true
+          git add episodes_part*.json || true
+          git add --ignore-unmatch vod.m3u series.m3u live.m3u || true
+          if git diff --staged --quiet; then
+            echo "Aucun changement détecté — rien à commiter"
+          else
+            COUNT=$(git diff --staged --name-only | wc -l)
+            git commit -m "data: auto-refresh IPTV catalog ($(date '+%Y-%m-%d')) [$COUNT fichiers]"
+            git push
+            echo "✅ Données mises à jour et poussées sur GitHub"
+          fi

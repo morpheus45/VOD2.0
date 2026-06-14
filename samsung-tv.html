@@ -1,0 +1,424 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PIPSILY TV — Installation Samsung Smart TV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #05080f;
+      color: #eef4ff;
+      font-family:'Outfit','Segoe UI',system-ui,-apple-system,sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      width: 100%;
+      padding: 60px 24px 40px;
+      text-align: center;
+      background: linear-gradient(180deg, #0d1a31 0%, #05080f 100%);
+    }
+    .logo { width: 56px; height: 56px; margin-bottom: 20px; }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 900;
+      background: linear-gradient(135deg, #7B5FE8, #38A8E8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      font-size: clamp(15px, 2.5vw, 18px);
+      color: #7a9cc0;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Download cards ── */
+    .download-section {
+      width: 100%;
+      max-width: 760px;
+      padding: 48px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .dl-card {
+      background: linear-gradient(135deg, #0d1a31, #111828);
+      border: 1px solid rgba(107,63,224,.35);
+      border-radius: 20px;
+      padding: 28px 28px 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      transition: border-color .2s, transform .15s;
+    }
+    .dl-card:hover { border-color: rgba(107,63,224,.7); transform: translateY(-2px); }
+
+    .dl-icon {
+      font-size: 48px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .dl-info { flex: 1; min-width: 0; }
+    .dl-info h2 { font-size: 20px; font-weight: 800; color: #eef4ff; margin-bottom: 4px; }
+    .dl-info .dl-sub { font-size: 13px; color: #7a9cc0; margin-bottom: 14px; line-height: 1.5; }
+
+    .btn-dl {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      color: #fff;
+      background: linear-gradient(135deg, #7B5FE8, #38A8E8);
+      transition: opacity .15s, transform .1s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-dl:hover { opacity: .9; transform: scale(1.03); }
+    .btn-dl svg { width: 18px; height: 18px; fill: currentColor; }
+
+    .dl-size { font-size: 12px; color: #4a6a8a; margin-top: 10px; }
+
+    /* ── Steps ── */
+    .steps-section {
+      width: 100%;
+      max-width: 760px;
+      padding: 0 24px 64px;
+    }
+
+    .steps-section h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #eef4ff;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .step-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .step {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 16px;
+      padding: 20px 22px;
+    }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7B5FE8, #38A8E8);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-body h3 { font-size: 15px; font-weight: 700; color: #eef4ff; margin-bottom: 6px; }
+    .step-body p, .step-body li {
+      font-size: 14px;
+      color: #8aadcc;
+      line-height: 1.6;
+    }
+    .step-body ul { padding-left: 18px; }
+    .step-body .code {
+      display: inline-block;
+      background: rgba(107,63,224,.15);
+      border: 1px solid rgba(107,63,224,.3);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: 'Consolas', monospace;
+      font-size: 13px;
+      color: #a89be0;
+    }
+
+    .tip {
+      display: flex;
+      gap: 12px;
+      background: rgba(56,168,232,.07);
+      border: 1px solid rgba(56,168,232,.2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-top: 16px;
+    }
+    .tip-icon { font-size: 20px; flex-shrink: 0; }
+    .tip p { font-size: 13px; color: #7a9cc0; line-height: 1.5; }
+    .tip strong { color: #38A8E8; }
+
+    /* ── Divider ── */
+    .divider {
+      width: 100%;
+      max-width: 760px;
+      height: 1px;
+      background: rgba(255,255,255,.06);
+      margin: 0 24px 40px;
+    }
+
+    /* ── Requirements ── */
+    .req-section {
+      width: 100%;
+      max-width: 760px;
+      padding: 0 24px 64px;
+    }
+    .req-section h2 { font-size: 18px; font-weight: 700; color: #eef4ff; margin-bottom: 18px; text-align: center; }
+    .req-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .req-item {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 14px;
+      padding: 16px 18px;
+      font-size: 14px;
+      color: #8aadcc;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .req-item span:first-child { font-size: 22px; }
+
+    /* ── FAQ ── */
+    .faq-section {
+      width: 100%;
+      max-width: 760px;
+      padding: 0 24px 80px;
+    }
+    .faq-section h2 { font-size: 18px; font-weight: 700; color: #eef4ff; margin-bottom: 18px; text-align: center; }
+
+    details {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    summary {
+      padding: 16px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #c8d8ee;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+    summary::after { content: '＋'; color: #7B5FE8; font-size: 18px; }
+    details[open] summary::after { content: '－'; }
+    .faq-body { padding: 0 20px 16px; font-size: 14px; color: #7a9cc0; line-height: 1.6; }
+
+    /* ── Footer ── */
+    footer {
+      padding: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: #2a4a6a;
+      border-top: 1px solid rgba(255,255,255,.05);
+      width: 100%;
+    }
+    footer a { color: #4a7aaa; text-decoration: none; }
+
+    @media (max-width: 560px) {
+      .dl-card { flex-direction: column; gap: 16px; }
+      .dl-icon { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Hero ───────────────────────────────────────────────────── -->
+  <div class="hero">
+    <img class="logo" src="./icons/icon-192.png" alt="PIPSILY" />
+    <h1>PIPSILY TV</h1>
+    <p>Installe l'application sur ta Samsung Smart TV en 3 étapes simples — aucun compte requis.</p>
+  </div>
+
+  <!-- ── Téléchargements ────────────────────────────────────────── -->
+  <div class="download-section">
+
+    <div class="dl-card">
+      <div class="dl-icon">🪟</div>
+      <div class="dl-info">
+        <h2>Windows 10 / 11</h2>
+        <div class="dl-sub">Extraire le ZIP, double-cliquer sur <span class="code">INSTALLER.bat</span><br>et suivre les instructions. Tout est inclus.</div>
+        <a class="btn-dl" href="https://github.com/morpheus45/VOD/releases/download/tv-v1/PIPSILY-TV-Install.zip">
+          <svg viewBox="0 0 24 24"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5v-2z"/></svg>
+          Télécharger pour Windows
+        </a>
+        <div class="dl-size">ZIP · 2 Mo · sdb Samsung inclus · aucun logiciel requis</div>
+      </div>
+    </div>
+
+    <div class="dl-card">
+      <div class="dl-icon">🍎</div>
+      <div class="dl-info">
+        <h2>macOS / Apple</h2>
+        <div class="dl-sub">Extraire le ZIP, double-cliquer sur <span class="code">INSTALLER.command</span><br>et suivre les instructions dans le Terminal.</div>
+        <a class="btn-dl" href="https://github.com/morpheus45/VOD/releases/download/tv-v1/PIPSILY-TV-Install-Mac.zip">
+          <svg viewBox="0 0 24 24"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5v-2z"/></svg>
+          Télécharger pour Mac
+        </a>
+        <div class="dl-size">ZIP · 0.8 Mo · sdb Samsung inclus · aucun logiciel requis</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Prérequis ─────────────────────────────────────────────── -->
+  <div class="req-section">
+    <h2>Ce qu'il te faut</h2>
+    <div class="req-grid">
+      <div class="req-item"><span>📺</span><span>Samsung Smart TV 2016 ou plus récente (Tizen)</span></div>
+      <div class="req-item"><span>📶</span><span>TV et ordinateur sur le même réseau Wi-Fi</span></div>
+      <div class="req-item"><span>🪟</span><span>Windows 10 / 11 ou macOS 12+</span></div>
+      <div class="req-item"><span>⏱</span><span>Environ 5 minutes pour l'installation</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── Étapes ─────────────────────────────────────────────────── -->
+  <div class="steps-section">
+    <h2>Comment installer</h2>
+    <div class="step-list">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Activer le mode développeur sur la TV</h3>
+          <ul>
+            <li>Télécommande → <strong>Accueil</strong> → <strong>Paramètres ⚙</strong></li>
+            <li>→ <strong>Support</strong> → <strong>À propos de ce TV</strong></li>
+            <li>Cliquer <strong>5 fois</strong> sur le <strong>numéro de modèle</strong> affiché</li>
+            <li>Un dialogue apparaît → <strong>Mode développeur → ON</strong></li>
+            <li>Entrer l'<strong>adresse IP de ton PC/Mac</strong> (l'installateur te l'indique)</li>
+            <li>Confirmer → <strong>Redémarrer la TV</strong></li>
+          </ul>
+          <div class="tip">
+            <div class="tip-icon">💡</div>
+            <p>L'IP de ta TV se trouve dans : <strong>Paramètres → Général → Réseau → État du réseau → Informations IP</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Télécharger et extraire le ZIP</h3>
+          <ul>
+            <li>Clique sur le bouton de téléchargement correspondant à ton système</li>
+            <li><strong>Windows</strong> : clic droit sur le ZIP → <em>Extraire tout</em></li>
+            <li><strong>Mac</strong> : double-clic sur le ZIP (extraction automatique)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Lancer l'installateur et suivre les étapes</h3>
+          <ul>
+            <li><strong>Windows</strong> : double-clic sur <span class="code">INSTALLER.bat</span></li>
+            <li><strong>Mac</strong> : double-clic sur <span class="code">INSTALLER.command</span><br>
+                Si macOS bloque → clic droit → <em>Ouvrir</em> → <em>Ouvrir</em></li>
+            <li>L'installateur connecte la TV, installe l'app et la lance automatiquement</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── FAQ ───────────────────────────────────────────────────── -->
+  <div class="faq-section">
+    <h2>Questions fréquentes</h2>
+
+    <details>
+      <summary>La TV ne se connecte pas</summary>
+      <div class="faq-body">
+        Vérifie que :<br>
+        • Le mode développeur est bien activé et que la TV a redémarré<br>
+        • L'adresse IP du PC/Mac est correctement entrée dans les paramètres de la TV<br>
+        • La TV et l'ordinateur sont sur le <strong>même réseau Wi-Fi</strong> (pas un réseau invité)<br>
+        • Le pare-feu Windows n'est pas en train de bloquer la connexion
+      </div>
+    </details>
+
+    <details>
+      <summary>macOS dit "fichier non sécurisé"</summary>
+      <div class="faq-body">
+        C'est normal pour les scripts non signés par l'App Store. Solution :<br>
+        Clic droit sur <span class="code">INSTALLER.command</span> → <strong>Ouvrir</strong> → <strong>Ouvrir</strong><br>
+        Ou dans Terminal : <span class="code">chmod +x INSTALLER.command</span>
+      </div>
+    </details>
+
+    <details>
+      <summary>Je ne trouve pas mon numéro de modèle sur la TV</summary>
+      <div class="faq-body">
+        Va dans <strong>Paramètres → Support → À propos de ce TV</strong>.<br>
+        Le numéro de modèle est affiché à l'écran (ex: QN55Q80C). Clique dessus 5 fois avec OK sur la télécommande.
+      </div>
+    </details>
+
+    <details>
+      <summary>L'app se met-elle à jour automatiquement ?</summary>
+      <div class="faq-body">
+        Oui. À chaque lancement, PIPSILY TV vérifie si une mise à jour est disponible.<br>
+        Si c'est le cas, une notification apparaît et l'installation se fait en un clic, sans refaire la procédure d'installation.
+      </div>
+    </details>
+
+    <details>
+      <summary>Comment désinstaller l'application ?</summary>
+      <div class="faq-body">
+        Sur la TV : <strong>Accueil → Applications → (icône paramètres ⚙) → PIPSILY TV → Supprimer</strong>
+      </div>
+    </details>
+
+    <details>
+      <summary>Ma TV Samsung est compatible ?</summary>
+      <div class="faq-body">
+        Toutes les Samsung Smart TV depuis 2016 (système Tizen 3.0+) sont compatibles.<br>
+        Modèles : Séries F, H, J, K, M, N, R, Q, et plus récents.
+      </div>
+    </details>
+
+  </div>
+
+  <!-- ── Footer ─────────────────────────────────────────────────── -->
+  <footer>
+    PIPSILY TV · <a href="./">Retour à l'application</a>
+  </footer>
+
+</body>
+</html>

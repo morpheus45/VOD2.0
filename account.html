@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PIPSILY — Mon compte</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" />
+  <style>
+    *{ box-sizing:border-box; margin:0; padding:0 }
+    body{
+      min-height:100vh;
+      background:
+        radial-gradient(ellipse at 15% 0%,rgba(59,124,244,.12),transparent 40%),
+        radial-gradient(ellipse at 85% 0%,rgba(123,95,232,.10),transparent 40%),
+        #05080f;
+      font-family:'Outfit','Segoe UI',system-ui,-apple-system,sans-serif;
+      color:#eef4ff;
+    }
+    .topbar{
+      display:flex; align-items:center; gap:16px; padding:14px 20px;
+      background:rgba(5,8,15,.9); border-bottom:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(20px);
+    }
+    .logo-text{
+      font-size:20px; font-weight:900;
+      background:linear-gradient(120deg,#7B5FE8,#38A8E8,#fff);
+      -webkit-background-clip:text; color:transparent;
+    }
+    .back-btn{
+      display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:10px;
+      border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05);
+      color:#7a9cc0; font-size:13px; font-weight:600; cursor:pointer; text-decoration:none;
+      transition:all .15s;
+    }
+    .back-btn:hover{ background:rgba(255,255,255,.1); color:#eef4ff }
+    .page{ max-width:600px; margin:0 auto; padding:24px 16px 80px }
+    .page-title{ font-size:22px; font-weight:800; margin-bottom:6px }
+    .page-sub{ font-size:13px; color:#7a9cc0; margin-bottom:24px }
+    .card{
+      background:rgba(12,20,34,.85); border:1px solid rgba(255,255,255,.08);
+      border-radius:18px; padding:20px; margin-bottom:16px;
+    }
+    .card-title{
+      font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.08em;
+      color:#7a9cc0; margin-bottom:14px; display:flex; align-items:center; gap:8px;
+    }
+    .card-title::before{
+      content:''; width:3px; height:14px; border-radius:2px;
+      background:linear-gradient(180deg,#7B5FE8,#38A8E8); display:block;
+    }
+    .info-row{ display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.05) }
+    .info-row:last-child{ border-bottom:none }
+    .info-label{ font-size:13px; color:#7a9cc0 }
+    .info-value{ font-size:13px; font-weight:600; color:#eef4ff }
+    .badge{
+      display:inline-flex; align-items:center; gap:4px;
+      padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700;
+    }
+    .badge--active{ background:rgba(100,220,140,.15); color:#6ef7b0; border:1px solid rgba(100,220,140,.3) }
+    .badge--expired{ background:rgba(232,51,74,.15); color:#ff8899; border:1px solid rgba(232,51,74,.3) }
+    .badge--pending{ background:rgba(56,168,232,.12); color:#38A8E8; border:1px solid rgba(56,168,232,.3) }
+    .badge--admin{ background:rgba(59,124,244,.15); color:#82b4ff; border:1px solid rgba(59,124,244,.3) }
+    .device-item{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:12px; border-radius:12px; background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06); margin-bottom:8px;
+    }
+    .device-icon{ font-size:22px; flex-shrink:0 }
+    .device-info{ flex:1; min-width:0 }
+    .device-name{ font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+    .device-meta{ font-size:11px; color:#7a9cc0; margin-top:2px }
+    .device-current{ font-size:10px; font-weight:700; color:#6ef7b0; margin-left:6px }
+    .device-fee{ font-size:12px; color:#38A8E8; font-weight:600; flex-shrink:0 }
+    label{ display:block; font-size:12px; font-weight:600; color:#7a9cc0;
+      margin-bottom:6px; letter-spacing:.03em; text-transform:uppercase }
+    /* select conservé pour rétrocompat mais masqué sur TV */
+    select{
+      width:100%; padding:12px 40px 12px 14px; border-radius:11px;
+      border:1px solid rgba(255,255,255,.14);
+      background:#0e1929 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24'%3E%3Cpath fill='%237a9cc0' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 12px center;
+      color:#eef4ff; font-size:15px; outline:none; margin-bottom:12px;
+      transition:border-color .2s, box-shadow .2s;
+      -webkit-appearance:none; appearance:none; cursor:pointer;
+      min-height:48px;
+    }
+    select:focus{ border-color:#7B5FE8; box-shadow:0 0 0 3px rgba(123,95,232,.2) }
+    select option{ background:#0c1422; color:#eef4ff }
+
+    /* ── Sélecteur région custom — remplace le <select> sur TV ── */
+    .rgn-btn{
+      width:100%; padding:13px 44px 13px 16px; border-radius:11px;
+      border:1px solid rgba(255,255,255,.14); background:#0e1929;
+      color:#eef4ff; font-size:15px; text-align:left; cursor:pointer;
+      min-height:48px; position:relative; margin-bottom:6px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .rgn-btn:focus{ outline:3px solid #7B5FE8; outline-offset:2px }
+    .rgn-arrow{ color:#7a9cc0; font-size:18px; flex-shrink:0 }
+    .rgn-list{
+      max-height:260px; overflow-y:auto; border-radius:12px;
+      border:1px solid rgba(255,255,255,.12); background:#0c1422;
+      margin-bottom:12px; display:none;
+    }
+    .rgn-list.open{ display:block }
+    .rgn-item{
+      width:100%; padding:13px 16px; border:none; background:transparent;
+      color:#eef4ff; font-size:14px; text-align:left; cursor:pointer;
+      border-bottom:1px solid rgba(255,255,255,.05); display:block;
+    }
+    .rgn-item:last-child{ border-bottom:none }
+    .rgn-item:hover,.rgn-item:focus{ background:rgba(123,95,232,.18); outline:none }
+    .rgn-item.active{ color:#7B5FE8; font-weight:700 }
+    .rgn-item.active::after{ content:" ✓"; opacity:.7 }
+    input[type=password], input[type=text]{
+      width:100%; padding:12px 14px; border-radius:11px;
+      border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.06);
+      color:#eef4ff; font-size:15px; outline:none; margin-bottom:12px;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    input:focus{ border-color:#7B5FE8; box-shadow:0 0 0 3px rgba(123,95,232,.2) }
+    .btn{ padding:12px 20px; border-radius:12px; border:none; cursor:pointer;
+      font-size:14px; font-weight:700; transition:all .15s }
+    .btn-primary{ background:linear-gradient(135deg,#7B5FE8,#38A8E8); color:#fff; box-shadow:0 4px 16px rgba(123,95,232,.25) }
+    .btn-secondary{ background:rgba(255,255,255,.08); color:#eef4ff; border:1px solid rgba(255,255,255,.12) }
+    .btn-danger{ background:rgba(123,95,232,.15); color:#ff8899; border:1px solid rgba(123,95,232,.3) }
+    .btn:hover{ opacity:.85 }
+    .btn:active{ transform:scale(.97) }
+    .btn:disabled{ opacity:.5; cursor:default; transform:none }
+    .pin-row{ display:flex; gap:10px; align-items:flex-end }
+    .pin-row input{ flex:1; margin-bottom:0 }
+    .msg{ margin-top:12px; padding:10px 14px; border-radius:10px; font-size:13px;
+      display:none; line-height:1.5 }
+    .msg--success{ background:rgba(100,220,140,.1); border:1px solid rgba(100,220,140,.3); color:#7ef7b0 }
+    .msg--error{ background:rgba(232,51,74,.12); border:1px solid rgba(232,51,74,.3); color:#ff8899 }
+    .logout-wrap{ text-align:center; margin-top:8px }
+    .btn-logout{ background:transparent; border:1px solid rgba(255,255,255,.12);
+      color:#7a9cc0; padding:12px 32px; border-radius:12px; cursor:pointer;
+      font-size:14px; font-weight:600 }
+    .btn-logout:hover{ color:#eef4ff; border-color:rgba(255,255,255,.25) }
+    .loading{ text-align:center; padding:40px; color:#7a9cc0; font-size:14px }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="./index.html" class="back-btn">← Retour</a>
+    <img src="./logo.svg" alt="PIPSILY" style="height:34px;width:auto;display:block;filter:drop-shadow(0 0 8px rgba(123,111,232,.35))" />
+  </div>
+
+  <div class="page">
+    <div class="page-title">Mon compte</div>
+    <div class="page-sub">Gérez votre abonnement et vos paramètres</div>
+
+    <div id="pageContent" class="loading">Chargement…</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="./auth.js"></script>
+  <script>
+    const A = window.PIPSILY_AUTH || {};
+    const _esc = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    if(!A.getSession){ document.body.innerHTML = '<div style="padding:40px;color:#ff8899;font-family:sans-serif">⚠ Service non disponible — rechargez la page.</div>'; throw new Error("PIPSILY_AUTH manquant"); }
+
+    async function load(){
+      const session = await A.getSession();
+      if(!session){ window.location.href = "./login.html"; return; }
+
+      const sub  = await A.checkSubscription(session.user.id);
+      const prof = sub;
+
+      const { data: devs } = A.supabase
+        ? await A.supabase.from("devices").select("*").eq("user_id", session.user.id).order("created_at")
+        : { data: [] };
+
+      renderPage(session, prof, devs || []);
+    }
+
+    function statusBadge(prof){
+      if(prof.plan === "admin")      return '<span class="badge badge--admin">⚡ Admin</span>';
+      if(prof.plan === "unlimited")  return '<span class="badge badge--active">∞ Illimité</span>';
+      if(prof.ok)                    return '<span class="badge badge--active">✓ Actif</span>';
+      if(prof.subscription_expires_at) return '<span class="badge badge--expired">Expiré</span>';
+      return '<span class="badge badge--pending">⏳ En attente</span>';
+    }
+
+    function fmtDate(iso){
+      if(!iso) return "—";
+      return new Date(iso).toLocaleDateString("fr-FR",{ day:"2-digit", month:"long", year:"numeric" });
+    }
+
+    function deviceIcon(name){
+      if(!name) return "📱";
+      if(/TV|tv/i.test(name))   return "📺";
+      if(/Android/i.test(name)) return "📱";
+      if(/iOS|iPhone|iPad/i.test(name)) return "📱";
+      if(/Mac/i.test(name))     return "💻";
+      if(/PC|Windows/i.test(name)) return "🖥";
+      return "📱";
+    }
+
+    function renderPage(session, prof, devs){
+      const currentDevice = A.getDeviceId();
+      const expiresAt = prof.subscription_expires_at ? new Date(prof.subscription_expires_at) : null;
+      const monthlyTotal = 4.99 + devs.reduce((s,d) => s + (d.monthly_fee || 0), 0);
+
+      document.getElementById("pageContent").innerHTML = `
+
+        <!-- Abonnement -->
+        <div class="card">
+          <div class="card-title">Abonnement</div>
+          <div class="info-row">
+            <span class="info-label">Statut</span>
+            <span>${statusBadge(prof)}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">E-mail</span>
+            <span class="info-value">${_esc(session.user.email)}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Plan</span>
+            <span class="info-value">${prof.plan === "admin" ? "Administrateur" : prof.plan === "unlimited" ? "Illimité" : "Standard 4,99 €/mois"}</span>
+          </div>
+          ${expiresAt ? `
+          <div class="info-row">
+            <span class="info-label">Valable jusqu'au</span>
+            <span class="info-value">${fmtDate(expiresAt)}</span>
+          </div>` : ""}
+          ${prof.plan === "admin" || prof.plan === "unlimited" ? "" : `
+          <div class="info-row">
+            <span class="info-label">Total mensuel</span>
+            <span class="info-value" style="color:#38A8E8;font-size:15px;font-weight:800">${monthlyTotal.toFixed(2).replace(".",",")} €</span>
+          </div>`}
+        </div>
+
+        ${prof.plan === "admin" || prof.plan === "unlimited" ? "" : `
+        <!-- ── Paiement Wero ── -->
+        <div class="card" id="weroCard">
+          <div class="card-title">💳 Payer avec Wero</div>
+          <p style="font-size:13px;color:#7a9cc0;line-height:1.6;margin-bottom:14px">
+            Wero est l'appli de paiement instantané intégrée à votre banque
+            (Crédit Agricole, BNP, Société Générale, La Banque Postale, etc.).
+            Le paiement est gratuit et instantané.
+          </p>
+          <div style="background:rgba(56,168,232,.08);border:1px solid rgba(56,168,232,.25);border-radius:12px;padding:16px;margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span style="font-size:12px;color:#7a9cc0">Bénéficiaire</span>
+              <span style="font-size:13px;font-weight:700;color:#eef4ff" id="weroName">${A.WERO_NAME || "PIPSILY"}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span style="font-size:12px;color:#7a9cc0">Numéro de téléphone</span>
+              <span style="font-size:14px;font-weight:800;color:#38A8E8;font-family:monospace" id="weroPhone">${A.WERO_PHONE || "06 12 34 56 78"}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span style="font-size:12px;color:#7a9cc0">Montant à payer</span>
+              <span style="font-size:18px;font-weight:900;color:#6ef7b0">${monthlyTotal.toFixed(2).replace(".",",")} €</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="font-size:12px;color:#7a9cc0">Référence à indiquer</span>
+              <span style="font-size:12px;font-weight:700;color:#eef4ff;font-family:monospace">${_esc(session.user.email)}</span>
+            </div>
+          </div>
+          <ol style="font-size:13px;color:#7a9cc0;line-height:1.8;padding-left:18px;margin-bottom:14px">
+            <li>Ouvrez l'appli Wero (ou votre banque)</li>
+            <li>Envoyez <strong style="color:#6ef7b0">${monthlyTotal.toFixed(2).replace(".",",")} €</strong> au numéro <strong style="color:#38A8E8;font-family:monospace">${A.WERO_PHONE || "06 12 34 56 78"}</strong></li>
+            <li>Indiquez votre e-mail en référence : <strong style="color:#eef4ff">${_esc(session.user.email)}</strong></li>
+            <li>Cliquez sur "J'ai payé" ci-dessous</li>
+          </ol>
+          <button class="btn btn-primary" id="paidBtn" onclick="declarePayment(${monthlyTotal})" style="width:100%">
+            ✅ J'ai payé ${monthlyTotal.toFixed(2).replace(".",",")} €
+          </button>
+          <div class="msg" id="payMsg"></div>
+          <p style="font-size:11px;color:#7a9cc0;margin-top:10px;text-align:center;line-height:1.5">
+            Une fois le paiement reçu et confirmé, votre compte sera activé pour 30 jours.<br>
+            <strong>Activation généralement en moins d'1 heure.</strong>
+          </p>
+        </div>
+        `}
+
+        <!-- Appareils -->
+        <div class="card">
+          <div class="card-title">Mes appareils (${devs.length}/${prof.plan==="admin" ? "∞" : prof.plan==="unlimited" ? 3 : 1})</div>
+          <div id="deviceList">
+            ${devs.length === 0 ? '<p style="color:#7a9cc0;font-size:13px">Aucun appareil enregistré.</p>' :
+              devs.map(d => `
+                <div class="device-item">
+                  <span class="device-icon">${deviceIcon(d.device_name)}</span>
+                  <div class="device-info">
+                    <div class="device-name">${_esc(d.device_name) || "Appareil"}
+                      ${d.device_id === currentDevice ? '<span class="device-current">● Cet appareil</span>' : ""}
+                    </div>
+                    <div class="device-meta">Ajouté le ${fmtDate(d.created_at)} · Vu le ${fmtDate(d.last_seen)}</div>
+                  </div>
+                  ${d.monthly_fee > 0 ? `<span class="device-fee">+${(d.monthly_fee).toFixed(2).replace(".",",")} €/mois</span>` : ""}
+                </div>`).join("")
+            }
+          </div>
+          ${prof.plan !== "admin" && prof.plan !== "unlimited" ? `
+          <p style="margin-top:14px;font-size:12px;color:#7a9cc0;line-height:1.5">
+            Appareil supplémentaire : <strong style="color:#eef4ff">+1,50 €/mois</strong> facturé automatiquement.
+          </p>` : ""}
+        </div>
+
+        <!-- Ma région -->
+        <div class="card">
+          <div class="card-title">Ma région (TV Live)</div>
+          <p style="font-size:13px;color:#7a9cc0;margin-bottom:14px;line-height:1.5">
+            Choisissez votre région pour n'afficher que les chaînes régionales
+            correspondantes (ex : France 3 Bretagne, BFM Paris…).
+            Laissez sur <strong style="color:#eef4ff">Toutes les régions</strong> pour tout voir.
+          </p>
+          <label>Votre région</label>
+
+          <!-- Sélecteur custom (TV-friendly, D-pad navigable) -->
+          <button class="rgn-btn" id="rgnToggleBtn" type="button">
+            <span id="rgnCurrentLabel">Toutes les régions</span>
+            <span class="rgn-arrow">▾</span>
+          </button>
+          <div class="rgn-list" id="rgnList"></div>
+
+          <!-- select natif conservé en repli (invisible, pour les navigateurs qui le supportent bien) -->
+          <select id="regionSelect" onchange="saveRegion(this.value)" style="display:none">
+            <option value="">Toutes les régions</option>
+          </select>
+
+          <div class="msg" id="regionMsg"></div>
+        </div>
+
+
+        <!-- Code parental -->
+        <div class="card">
+          <div class="card-title">🔞 Contrôle parental</div>
+          <p style="font-size:13px;color:#7a9cc0;margin-bottom:14px;line-height:1.5">
+            Protège les contenus adultes avec un code PIN.<br>
+            Le verrou se réactive automatiquement à chaque fermeture de l'application.
+          </p>
+          <div id="pinSection"></div>
+          <div class="msg" id="pinMsg"></div>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="card">
+          <div class="card-title">Sécurité</div>
+          <label>Nouveau mot de passe</label>
+          <input type="password" id="newPwInput" placeholder="8 caractères minimum" minlength="8" />
+          <button class="btn btn-primary" onclick="changePw()">Changer le mot de passe</button>
+          <div class="msg" id="pwMsg"></div>
+        </div>
+
+        <!-- Interface -->
+        <div class="card">
+          <div class="card-title">Interface</div>
+          <label>Choisissez l'apparence de l'application</label>
+          <select id="ifaceSelect">
+            <option value="xstream">PIPSILY Xstream (par défaut)</option>
+            <option value="cosmos">Cosmos TV (style Google TV)</option>
+          </select>
+          <button class="btn btn-primary" onclick="applyIface()">Appliquer</button>
+          <div class="msg" id="ifaceMsg"></div>
+        </div>
+
+        <!-- Déconnexion -->
+        <div class="logout-wrap">
+          <button class="btn-logout" onclick="logout()">Se déconnecter</button>
+        </div>
+      `;
+
+      // Interface : pré-sélection + application
+      try{
+        const sel = document.getElementById("ifaceSelect");
+        if(sel) sel.value = localStorage.getItem("pf_theme") === "cosmos" ? "cosmos" : "xstream";
+      }catch(e){}
+
+      // Initialiser le PIN parental
+      initPinSection();
+
+      // Pré-sélectionner la région
+      initRegionSelect();
+
+      window._userId = session.user.id;
+    }
+
+    // ── Contrôle parental (PIN localStorage, verrou sessionStorage) ──────────
+    function initPinSection(){
+      const sec = document.getElementById("pinSection");
+      if(!sec) return;
+      const hasPin = !!localStorage.getItem("pipsily_adult_pin");
+      if(!hasPin){
+        sec.innerHTML =
+          '<label>Créer un code PIN (4 à 6 chiffres)</label>' +
+          '<input type="password" id="pinNew" inputmode="numeric" maxlength="6" placeholder="••••" />' +
+          '<label style="margin-top:4px">Confirmer le code</label>' +
+          '<input type="password" id="pinConfirm" inputmode="numeric" maxlength="6" placeholder="••••" style="margin-bottom:14px" />' +
+          '<button class="btn btn-primary" onclick="createPin()" style="width:100%">🔒 Activer le contrôle parental</button>';
+      } else {
+        sec.innerHTML =
+          '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:rgba(100,220,140,.08);border:1px solid rgba(100,220,140,.2);margin-bottom:14px">' +
+            '<span style="font-size:20px">🔒</span>' +
+            '<span style="font-size:13px;color:#6ef7b0;font-weight:600">Contrôle parental actif</span>' +
+          '</div>' +
+          '<label>Nouveau code (4 à 6 chiffres)</label>' +
+          '<input type="password" id="pinNew" inputmode="numeric" maxlength="6" placeholder="Nouveau code" style="margin-bottom:14px" />' +
+          '<div style="display:flex;gap:10px">' +
+            '<button class="btn btn-primary" onclick="changePin()" style="flex:1">Modifier le code</button>' +
+            '<button class="btn btn-danger" onclick="deletePin()" style="flex-shrink:0">Supprimer</button>' +
+          '</div>';
+      }
+    }
+
+    function createPin(){
+      const pin  = document.getElementById("pinNew").value.trim();
+      const conf = document.getElementById("pinConfirm").value.trim();
+      const msg  = document.getElementById("pinMsg");
+      if(!/^\d{4,6}$/.test(pin)){ showMsg(msg,"error","Le code doit contenir 4 à 6 chiffres."); return; }
+      if(pin !== conf){ showMsg(msg,"error","Les deux codes ne correspondent pas."); return; }
+      localStorage.setItem("pipsily_adult_pin", pin);
+      showMsg(msg,"success","✓ Code parental activé !");
+      setTimeout(() => initPinSection(), 800);
+    }
+
+    function changePin(){
+      const pin = document.getElementById("pinNew").value.trim();
+      const msg = document.getElementById("pinMsg");
+      if(!/^\d{4,6}$/.test(pin)){ showMsg(msg,"error","Le code doit contenir 4 à 6 chiffres."); return; }
+      localStorage.setItem("pipsily_adult_pin", pin);
+      sessionStorage.removeItem("pipsily_adult_unlocked");
+      showMsg(msg,"success","✓ Code parental modifié.");
+    }
+
+    function deletePin(){
+      const msg = document.getElementById("pinMsg");
+      localStorage.removeItem("pipsily_adult_pin");
+      sessionStorage.removeItem("pipsily_adult_unlocked");
+      showMsg(msg,"success","Code parental supprimé.");
+      setTimeout(() => initPinSection(), 800);
+    }
+
+    async function changePw(){
+      const pw  = document.getElementById("newPwInput").value;
+      const msg = document.getElementById("pwMsg");
+      if(pw.length < 8){ showMsg(msg, "error", "8 caractères minimum."); return; }
+      if(!A.supabase){ showMsg(msg, "error", "⚙️ Supabase non configuré."); return; }
+      const { error } = await A.supabase.auth.updateUser({ password: pw });
+      if(error) showMsg(msg, "error", error.message);
+      else showMsg(msg, "success", "✓ Mot de passe mis à jour.");
+    }
+
+    async function logout(){
+      await A.signOut();
+      window.location.href = "./login.html";
+    }
+
+    // ── Bascule d'interface (Xstream ↔ Cosmos TV) — n'affecte que l'apparence ──
+    function applyIface(){
+      const sel = document.getElementById("ifaceSelect");
+      const choice = sel && sel.value === "cosmos" ? "cosmos" : "xstream";
+      try{ localStorage.setItem("pf_theme", choice); }catch(e){}
+      const msg = document.getElementById("ifaceMsg");
+      if(msg){ msg.style.color = "#7CE2A8"; msg.textContent = "Interface appliquée — ouverture…"; }
+      // index.html route automatiquement vers la bonne interface selon pf_theme
+      setTimeout(() => { window.location.href = "./index.html"; }, 500);
+    }
+
+    // ── Déclaration de paiement Wero (statut "en attente" jusqu'à confirmation admin) ──
+    async function declarePayment(amount){
+      const btn = document.getElementById("paidBtn");
+      const msg = document.getElementById("payMsg");
+      btn.disabled = true; btn.textContent = "Envoi…";
+      try {
+        if(!A.supabase) throw new Error("Supabase non configuré");
+        // Vérifier qu'il n'y a pas déjà un paiement en attente
+        const { data: existing } = await A.supabase.from("payments")
+          .select("id").eq("user_id", window._userId).is("confirmed_at", null);
+        if(existing && existing.length > 0){
+          showMsg(msg, "error", "Un paiement est déjà en attente de confirmation. Patientez ou contactez l'administrateur.");
+          btn.disabled = false; btn.textContent = `✅ J'ai payé ${amount.toFixed(2).replace(".",",")} €`;
+          return;
+        }
+        const { error } = await A.supabase.from("payments").insert({
+          user_id: window._userId,
+          amount: amount,
+          type: "subscription",
+          notes: "Paiement Wero déclaré par l'utilisateur — en attente de confirmation",
+          confirmed_at: null
+        });
+        if(error) throw error;
+        showMsg(msg, "success",
+          "✅ Paiement déclaré ! L'administrateur sera notifié et activera votre compte après vérification (généralement en moins d'1 heure).");
+        btn.textContent = "⏳ En attente de confirmation";
+        // Rester désactivé
+      } catch(err){
+        showMsg(msg, "error", "Erreur : " + (err.message || err));
+        btn.disabled = false; btn.textContent = `✅ J'ai payé ${amount.toFixed(2).replace(".",",")} €`;
+      }
+    }
+
+    function showMsg(el, type, text){
+      el.className = `msg msg--${type}`;
+      el.textContent = text;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 4000);
+    }
+
+    function saveRegion(value){
+      if(value) localStorage.setItem("pipsily_region", value);
+      else      localStorage.removeItem("pipsily_region");
+      const msg = document.getElementById("regionMsg");
+      showMsg(msg, "success", value
+        ? `✓ Région enregistrée : ${value}. Relancez l'app pour appliquer.`
+        : "✓ Filtre régional désactivé. Toutes les chaînes seront affichées.");
+    }
+
+    // Régions françaises de repli — affichées si le flux live n'a pas encore été analysé
+    const _STATIC_REGIONS = [
+      "Alsace","Aquitaine","Auvergne","Bourgogne","Bretagne",
+      "Centre","Champagne-Ardenne","Corse","Franche-Comté",
+      "Languedoc-Roussillon","Limousin","Lorraine","Midi-Pyrénées",
+      "Nord-Pas-de-Calais","Normandie","Pays de la Loire","Picardie",
+      "Poitou-Charentes","Provence-Alpes-Côte d'Azur","Rhône-Alpes",
+      "Grand Est","Hauts-de-France","Île-de-France","Nouvelle-Aquitaine",
+      "Occitanie","Auvergne-Rhône-Alpes","Bourgogne-Franche-Comté",
+      "Centre-Val de Loire","Normandie",
+      // Grandes villes (BFM régionales)
+      "Paris","Lyon","Marseille","Bordeaux","Toulouse","Lille",
+      "Rennes","Nantes","Strasbourg","Montpellier","Nice",
+      // DOM-TOM
+      "Guadeloupe","Martinique","Guyane","La Réunion","Mayotte"
+    ];
+
+    // ── Sélecteur région custom (TV-friendly, D-pad navigable) ──────────────
+    function initRegionSelect(){
+      const toggleBtn   = document.getElementById("rgnToggleBtn");
+      const listEl      = document.getElementById("rgnList");
+      const labelEl     = document.getElementById("rgnCurrentLabel");
+      const hiddenSel   = document.getElementById("regionSelect");
+      if(!toggleBtn || !listEl) return;
+
+      const saved = localStorage.getItem("pipsily_region") || "";
+
+      // Toujours utiliser la liste statique dans Mon compte.
+      // pipsily_available_regions peut contenir des noms de chaînes corrompus
+      // si le flux IPTV a des préfixes "- ". La liste statique est toujours fiable.
+      const list = _STATIC_REGIONS;
+
+      // Dédupliquer
+      const seen = new Set();
+      const items = [{ label:"Toutes les régions", value:"" }];
+      list.forEach(name => {
+        const key = name.toLowerCase();
+        if(seen.has(key)) return;
+        seen.add(key);
+        items.push({ label: name.charAt(0).toUpperCase() + name.slice(1), value: name });
+      });
+
+      // Afficher le label courant
+      const cur = items.find(i => i.value === saved) || items[0];
+      labelEl.textContent = cur.label;
+
+      // Peupler la liste
+      listEl.innerHTML = "";
+      items.forEach(item => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "rgn-item" + (item.value === saved ? " active" : "");
+        btn.textContent = item.label;
+        btn.dataset.val = item.value;
+        btn.onclick = () => {
+          saveRegion(item.value);
+          labelEl.textContent = item.label;
+          listEl.querySelectorAll(".rgn-item").forEach(b =>
+            b.classList.toggle("active", b.dataset.val === item.value)
+          );
+          listEl.classList.remove("open");
+          toggleBtn.querySelector(".rgn-arrow").textContent = "▾";
+          toggleBtn.focus();
+        };
+        listEl.appendChild(btn);
+      });
+
+      // Toggle ouverture/fermeture
+      toggleBtn.onclick = () => {
+        const isOpen = listEl.classList.toggle("open");
+        toggleBtn.querySelector(".rgn-arrow").textContent = isOpen ? "▴" : "▾";
+        if(isOpen){
+          // Focus sur l'item actif ou le premier
+          const active = listEl.querySelector(".rgn-item.active") || listEl.querySelector(".rgn-item");
+          active?.focus();
+        }
+      };
+
+      // Fermer si clic en dehors
+      document.addEventListener("click", e => {
+        if(!toggleBtn.contains(e.target) && !listEl.contains(e.target)){
+          listEl.classList.remove("open");
+          toggleBtn.querySelector(".rgn-arrow").textContent = "▾";
+        }
+      });
+
+      // Navigation D-pad / clavier dans la liste
+      listEl.addEventListener("keydown", e => {
+        const btns = [...listEl.querySelectorAll(".rgn-item")];
+        const idx  = btns.indexOf(document.activeElement);
+        if(e.key === "ArrowDown"){ e.preventDefault(); btns[Math.min(idx+1,btns.length-1)]?.focus(); }
+        if(e.key === "ArrowUp")  { e.preventDefault();
+          if(idx <= 0){ listEl.classList.remove("open"); toggleBtn.querySelector(".rgn-arrow").textContent="▾"; toggleBtn.focus(); }
+          else btns[idx-1]?.focus();
+        }
+        if(e.key === "Escape"||e.key === "GoBack"){ listEl.classList.remove("open"); toggleBtn.querySelector(".rgn-arrow").textContent="▾"; toggleBtn.focus(); }
+      });
+    }
+
+    load();
+  </script>
+</body>
+</html>

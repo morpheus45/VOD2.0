@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  IPTV / VOD : les serveurs Xtream Codes utilisent HTTP (port 8080 typiquement).
+  On autorise le cleartext pour TOUS les domaines — nécessaire pour PIPSILY.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

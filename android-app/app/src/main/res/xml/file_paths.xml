@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FileProvider : chemins autorisés pour partager l'APK téléchargé
+  avec l'installeur système (ACTION_INSTALL_PACKAGE).
+-->
+<paths>
+    <!-- Stockage externe app-spécifique (Android 10+ sans permission) -->
+    <external-files-path name="apk_dl"    path="." />
+    <!-- Cache interne (fallback si pas de stockage externe) -->
+    <cache-path         name="apk_cache"  path="." />
+</paths>

@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PIPSILY — Guide d'installation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #05080f; color: #eef4ff;
+      font-family: 'Outfit','Segoe UI',system-ui,-apple-system,sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+      background: rgba(5,8,15,.92); border-bottom: 1px solid rgba(255,255,255,.07);
+      backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-logo { height: 32px; width: auto; }
+    .topbar-back {
+      margin-left: auto; padding: 7px 14px; border-radius: 9px;
+      border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04);
+      color: #7a9cc0; font-size: 13px; font-weight: 600; text-decoration: none;
+      transition: all .15s;
+    }
+    .topbar-back:hover { background: rgba(255,255,255,.09); color: #eef4ff; }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 52px 24px 44px; text-align: center;
+      background: linear-gradient(180deg,#0d1a31 0%,#05080f 100%);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .hero-pill {
+      display: inline-block; padding: 4px 14px; border-radius: 999px;
+      background: rgba(123,95,232,.15); border: 1px solid rgba(123,95,232,.35);
+      font-size: 11px; font-weight: 800; letter-spacing: .12em;
+      text-transform: uppercase; color: #b59aff; margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-size: clamp(26px,5vw,46px); font-weight: 900;
+      background: linear-gradient(135deg,#7B5FE8,#38A8E8);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 12px;
+    }
+    .hero p {
+      font-size: clamp(13px,2vw,16px); color: #7a9cc0;
+      max-width: 500px; margin: 0 auto; line-height: 1.65;
+    }
+
+    /* ── Tabs ── */
+    .tabs-wrap { max-width: 960px; margin: 0 auto; padding: 36px 16px 80px; }
+    .tabs {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      justify-content: center; margin-bottom: 36px;
+    }
+    .tab {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: 12px; cursor: pointer;
+      border: 1.5px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.04);
+      color: #7a9cc0; font-size: 13px; font-weight: 600;
+      transition: all .2s; white-space: nowrap; user-select: none;
+    }
+    .tab:hover { border-color: rgba(123,95,232,.4); color: #eef4ff; }
+    .tab.active {
+      background: linear-gradient(135deg,rgba(123,95,232,.18),rgba(56,168,232,.12));
+      border-color: #7B5FE8; color: #eef4ff;
+    }
+    .tab-icon { font-size: 17px; }
+
+    /* ── Panel ── */
+    .panel { display: none; animation: fadeIn .22s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+    /* ── Device header ── */
+    .device-header { text-align: center; margin-bottom: 32px; }
+    .device-emoji { font-size: 54px; margin-bottom: 12px; display: block; }
+    .device-title { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
+    .device-sub {
+      color: #7a9cc0; font-size: 14px; line-height: 1.6;
+      max-width: 480px; margin: 0 auto;
+    }
+
+    /* ── Steps ── */
+    .steps { display: flex; flex-direction: column; gap: 14px; }
+    .step {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
+      border-radius: 16px; padding: 18px 20px;
+    }
+    .step-num {
+      flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg,#7B5FE8,#38A8E8);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 14px; color: #fff;
+    }
+    .step-body { flex: 1; }
+    .step-title { font-weight: 700; font-size: 15px; margin-bottom: 5px; }
+    .step-desc { color: #8aabcc; font-size: 13px; line-height: 1.65; }
+    .step-desc strong { color: #eef4ff; }
+    .step-desc code {
+      background: rgba(123,95,232,.15); border: 1px solid rgba(123,95,232,.3);
+      padding: 2px 8px; border-radius: 6px; font-size: 12px;
+      color: #c4aaff; font-family: 'Courier New', monospace; display: inline-block;
+      margin: 4px 0; word-break: break-all;
+    }
+
+    /* ── Tip / Warn / Info ── */
+    .tip, .warn, .info {
+      margin-top: 20px; padding: 14px 18px; border-radius: 12px;
+      font-size: 13px; color: #8aabcc; line-height: 1.65;
+    }
+    .tip  { background: rgba(56,168,232,.06); border: 1px solid rgba(56,168,232,.2); }
+    .tip strong { color: #38A8E8; }
+    .warn { background: rgba(232,168,56,.06); border: 1px solid rgba(232,168,56,.22); }
+    .warn strong { color: #e8a838; }
+    .info { background: rgba(110,247,176,.05); border: 1px solid rgba(110,247,176,.2); }
+    .info strong { color: #6ef7b0; }
+
+    /* ── Method tabs ── */
+    .methods { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+    .method-btn {
+      flex: 1; min-width: 140px; padding: 11px 16px; border-radius: 12px;
+      border: 1.5px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04);
+      color: #7a9cc0; font-size: 13px; font-weight: 600; cursor: pointer;
+      text-align: center; transition: all .2s;
+    }
+    .method-btn:hover { border-color: rgba(123,95,232,.4); color: #eef4ff; }
+    .method-btn.active { border-color: #7B5FE8; color: #eef4ff; background: rgba(123,95,232,.1); }
+    .method-panel { display: none; }
+    .method-panel.active { display: block; }
+
+    /* ── Buttons ── */
+    .dl-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 13px 26px; border-radius: 14px; margin-top: 18px;
+      background: linear-gradient(135deg,#7B5FE8,#38A8E8);
+      color: #fff; text-decoration: none; font-weight: 700; font-size: 15px;
+      transition: opacity .2s;
+    }
+    .dl-btn:hover { opacity: .85; }
+    .dl-btn-ghost {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 22px; border-radius: 14px; margin-top: 10px;
+      border: 1.5px solid rgba(255,255,255,.15); background: transparent;
+      color: #8aabcc; text-decoration: none; font-weight: 600; font-size: 14px;
+      transition: all .2s;
+    }
+    .dl-btn-ghost:hover { border-color: rgba(255,255,255,.3); color: #eef4ff; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 4px; }
+
+    /* ── Compat ── */
+    .compat { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
+    .compat-item {
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 13px; border-radius: 10px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+      font-size: 12px; font-weight: 600; color: #8aabcc;
+    }
+
+    /* ── FAQ ── */
+    .faq-wrap { max-width: 960px; margin: 0 auto; padding: 0 16px 80px; }
+    .faq-divider { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 0 0 32px; }
+    .faq-title {
+      font-size: 13px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .1em; color: #4a6080; margin-bottom: 16px;
+    }
+    .faq-item { border-bottom: 1px solid rgba(255,255,255,.07); }
+    .faq-q {
+      width: 100%; background: none; border: none; color: #eef4ff;
+      font-size: 14px; font-weight: 600; padding: 16px 4px;
+      text-align: left; cursor: pointer; display: flex;
+      justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .faq-q:hover { color: #b4a0f0; }
+    .faq-arrow { flex-shrink: 0; transition: transform .25s; font-size: 11px; color: #4a6080; }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height .3s ease; color: #8aabcc; font-size: 13px; line-height: 1.7; }
+    .faq-item.open .faq-a { max-height: 400px; }
+    .faq-a-inner { padding: 0 4px 16px; }
+    .faq-a-inner strong { color: #eef4ff; }
+
+    @media (max-width: 600px) {
+      .tab { padding: 8px 13px; font-size: 12px; }
+      .tab-icon { font-size: 15px; }
+      .step { padding: 14px 16px; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <img src="./logo.svg" alt="PIPSILY" class="topbar-logo" />
+    <a href="./index.html" class="topbar-back">← Retour</a>
+  </div>
+
+  <div class="hero">
+    <div class="hero-pill">Guide d'installation</div>
+    <h1>Installer PIPSILY</h1>
+    <p>Choisissez votre appareil et suivez les étapes — moins de 5 minutes.</p>
+  </div>
+
+  <div class="tabs-wrap">
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-tab="iphone"><span class="tab-icon">🍎</span> iPhone / iPad</div>
+      <div class="tab" data-tab="android"><span class="tab-icon">📱</span> Android</div>
+      <div class="tab" data-tab="androidtv"><span class="tab-icon">🎮</span> Android TV</div>
+      <div class="tab" data-tab="samsung"><span class="tab-icon">📺</span> Samsung TV</div>
+      <div class="tab" data-tab="firetv"><span class="tab-icon">🔥</span> Fire TV</div>
+      <div class="tab" data-tab="appletv"><span class="tab-icon">🍏</span> Apple TV</div>
+      <div class="tab" data-tab="pc"><span class="tab-icon">💻</span> PC / Mac</div>
+    </div>
+
+    <!-- ══ iPhone / iPad ══ -->
+    <div class="panel active" id="panel-iphone">
+      <div class="device-header">
+        <span class="device-emoji">🍎</span>
+        <div class="device-title">iPhone &amp; iPad</div>
+        <div class="device-sub">Ajoutez PIPSILY à votre écran d'accueil — comme une vraie app, sans passer par l'App Store.</div>
+      </div>
+      <div class="compat">
+        <div class="compat-item">✓ iOS 14+</div>
+        <div class="compat-item">✓ iPhone SE / 8 / X / 11–16 Pro Max</div>
+        <div class="compat-item">✓ iPad (toutes générations)</div>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Ouvrez Safari — pas Chrome</div>
+            <div class="step-desc">Cette procédure fonctionne <strong>uniquement avec Safari</strong>. Si vous utilisez Chrome ou Firefox, ouvrez Safari d'abord.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Accédez à PIPSILY</div>
+            <div class="step-desc">Dans la barre d'adresse, tapez :<br><code>morpheus45.github.io/VOD</code><br>Attendez le chargement complet de la page.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Appuyez sur l'icône Partager 📤</div>
+            <div class="step-desc">En bas de l'écran (iPhone) ou en haut (iPad) — le carré avec une flèche vers le haut. Si vous ne la voyez pas, faites défiler la page vers le haut.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Appuyez sur « Sur l'écran d'accueil »</div>
+            <div class="step-desc">Faites défiler le menu vers le haut jusqu'à voir <strong>« Sur l'écran d'accueil »</strong> (icône carré avec +). Appuyez dessus.<br>Vérifiez le nom <strong>PIPSILY</strong> puis appuyez sur <strong>Ajouter</strong> en haut à droite.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">C'est installé !</div>
+            <div class="step-desc">PIPSILY apparaît sur votre écran d'accueil. Appuyez dessus pour l'ouvrir en plein écran, sans barre Safari — comme une app native.</div>
+          </div>
+        </div>
+      </div>
+      <div class="tip"><strong>💡 Mise à jour automatique :</strong> L'app se met à jour silencieusement à chaque ouverture.</div>
+      <div class="warn"><strong>⚠ Page blanche ?</strong> Vérifiez votre connexion Wi-Fi et reconnectez-vous. Fonctionne aussi en 4G/5G.</div>
+    </div>
+
+    <!-- ══ Android ══ -->
+    <div class="panel" id="panel-android">
+      <div class="device-header">
+        <span class="device-emoji">📱</span>
+        <div class="device-title">Android (téléphone &amp; tablette)</div>
+        <div class="device-sub">Installez via Chrome (sans téléchargement) ou téléchargez l'APK natif pour une expérience optimale.</div>
+      </div>
+      <div class="compat">
+        <div class="compat-item">✓ Android 8+</div>
+        <div class="compat-item">✓ Samsung Galaxy</div>
+        <div class="compat-item">✓ Xiaomi / POCO</div>
+        <div class="compat-item">✓ Google Pixel</div>
+        <div class="compat-item">✓ OnePlus / Oppo / Sony</div>
+      </div>
+      <div class="methods">
+        <div class="method-btn active" data-method="pwa-and">🌐 Via Chrome (PWA)</div>
+        <div class="method-btn" data-method="apk-and">📦 APK natif</div>
+      </div>
+      <div class="method-panel active" id="method-pwa-and">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Ouvrez Chrome</div>
+              <div class="step-desc">Ouvrez <strong>Google Chrome</strong> sur votre téléphone Android.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Accédez à PIPSILY</div>
+              <div class="step-desc">Tapez dans la barre d'adresse :<br><code>morpheus45.github.io/VOD</code></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Installez l'application</div>
+              <div class="step-desc">Une bannière <strong>« Installer PIPSILY »</strong> apparaît en bas — appuyez dessus.<br>Si absente : <strong>⋮ 3 points</strong> → <strong>Ajouter à l'écran d'accueil</strong>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Confirmez et profitez</div>
+              <div class="step-desc">Appuyez sur <strong>Installer</strong>. PIPSILY s'ajoute à votre écran d'accueil et au tiroir d'applications.</div>
+            </div>
+          </div>
+        </div>
+        <div class="tip"><strong>💡 Compatible :</strong> Samsung Galaxy, Xiaomi, Oppo, OnePlus, Google Pixel, Sony, Motorola et tous les Android avec Chrome.</div>
+      </div>
+      <div class="method-panel" id="method-apk-and">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Téléchargez l'APK PIPSILY</div>
+              <div class="step-desc">Appuyez sur le bouton ci-dessous pour télécharger l'application (~8 Mo).</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Autorisez les sources inconnues (si demandé)</div>
+              <div class="step-desc">Si Android le demande : <strong>Paramètres → Installer des apps inconnues</strong> → activez pour Chrome → revenez et relancez.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Installez et ouvrez</div>
+              <div class="step-desc">Appuyez sur <strong>Installer</strong>. PIPSILY est maintenant dans vos applications.</div>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <a href="https://github.com/morpheus45/VOD/releases/download/v24/PIPSILY.apk" class="dl-btn">⬇ Télécharger l'APK (v24)</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Android TV / Google TV ══ -->
+    <div class="panel" id="panel-androidtv">
+      <div class="device-header">
+        <span class="device-emoji">🎮</span>
+        <div class="device-title">Android TV &amp; Google TV</div>
+        <div class="device-sub">APK natif optimisé pour la télécommande — navigation fluide avec les touches directionnelles.</div>
+      </div>
+      <div class="compat">
+        <div class="compat-item">✓ Sony Bravia Android TV</div>
+        <div class="compat-item">✓ Philips Android TV</div>
+        <div class="compat-item">✓ TCL / Hisense</div>
+        <div class="compat-item">✓ Chromecast with Google TV</div>
+        <div class="compat-item">✓ Nvidia Shield</div>
+        <div class="compat-item">✓ Xiaomi Mi Box / TV Stick</div>
+      </div>
+      <div class="methods">
+        <div class="method-btn active" data-method="apk-tv">📦 APK via Downloader (recommandé)</div>
+        <div class="method-btn" data-method="browser-tv">🌐 Via navigateur</div>
+        <div class="method-btn" data-method="adb-tv">🔧 Via ADB (PC)</div>
+      </div>
+
+      <div class="method-panel active" id="method-apk-tv">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Activez les sources inconnues sur la TV</div>
+              <div class="step-desc"><strong>Paramètres ⚙️ → Sécurité et restrictions → Sources inconnues</strong> → activez pour <strong>Downloader</strong>.<br><br>Sur certaines TV : Paramètres → Applications → Accès spécial → Installer des apps inconnues.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Installez « Downloader » depuis le Play Store</div>
+              <div class="step-desc">Ouvrez le <strong>Play Store</strong> sur votre TV → cherchez <strong>Downloader</strong> (icône orange, par AFTVnews) → Installez. Gratuit.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Ouvrez Downloader et entrez l'URL</div>
+              <div class="step-desc">Lancez Downloader → dans le champ URL, tapez :<br><code>bit.ly/pipsily-apk</code><br>Appuyez sur <strong>Go</strong>. Le téléchargement démarre (~8 Mo).</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Installez l'APK</div>
+              <div class="step-desc">Une fois terminé, appuyez sur <strong>Installer</strong>. Si un avertissement apparaît, appuyez sur <strong>Installer quand même</strong>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-title">Lancez PIPSILY et connectez-vous</div>
+              <div class="step-desc">Appuyez sur <strong>Ouvrir</strong> ou retrouvez PIPSILY dans <strong>Applications → Voir toutes</strong>. Connectez-vous avec votre compte.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">6</div>
+            <div class="step-body">
+              <div class="step-title">Épinglez PIPSILY en tête de liste (optionnel)</div>
+              <div class="step-desc">Maintenez la sélection sur PIPSILY → <strong>Déplacer en tête de liste</strong> pour l'avoir toujours visible sur votre écran d'accueil TV.</div>
+            </div>
+          </div>
+        </div>
+        <div class="info"><strong>✓ URL alternative complète :</strong><br><code>github.com/morpheus45/VOD/releases/download/v24/PIPSILY.apk</code></div>
+        <div class="tip"><strong>💡 Mise à jour :</strong> Quand une nouvelle version est disponible, une notification apparaît dans PIPSILY. Répétez les étapes 3–4 pour mettre à jour.</div>
+      </div>
+
+      <div class="method-panel" id="method-browser-tv">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Installez un navigateur depuis le Play Store</div>
+              <div class="step-desc">Sur votre TV, installez l'un de ces navigateurs :<br><br>• <strong>TV Bro</strong> — le plus adapté aux télécommandes (recommandé)<br>• <strong>Firefox for Android TV</strong><br>• <strong>Chrome</strong> (si disponible sur votre TV)</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Accédez à PIPSILY</div>
+              <div class="step-desc">Ouvrez le navigateur → saisissez :<br><code>morpheus45.github.io/VOD</code><br>Astuce : connectez un <strong>clavier Bluetooth</strong> pour taper plus facilement.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Connectez-vous et ajoutez en favori</div>
+              <div class="step-desc">Entrez vos identifiants. Ajoutez en <strong>favori</strong> pour un accès direct la prochaine fois.</div>
+            </div>
+          </div>
+        </div>
+        <div class="tip"><strong>💡 TV Bro</strong> est le navigateur le plus adapté aux télécommandes — navigation fluide avec les flèches directionnelles.</div>
+      </div>
+
+      <div class="method-panel" id="method-adb-tv">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Activez le débogage ADB sur la TV</div>
+              <div class="step-desc"><strong>Paramètres → À propos → Construire</strong> → appuyez 7 fois → <strong>Options développeur</strong> → activez <strong>Débogage ADB</strong>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Téléchargez l'APK sur votre PC</div>
+              <div class="step-desc"><code>github.com/morpheus45/VOD/releases/download/v24/PIPSILY.apk</code></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Installez via ADB</div>
+              <div class="step-desc">Dans un terminal PC (remplacez par l'IP de votre TV) :<br><code>adb connect &lt;IP-TV&gt;:5555</code><br><code>adb install PIPSILY.apk</code></div>
+            </div>
+          </div>
+        </div>
+        <div class="warn"><strong>⚠ Méthode avancée.</strong> Réservée aux utilisateurs à l'aise avec les outils Android. Préférez la méthode Downloader.</div>
+      </div>
+    </div>
+
+    <!-- ══ Samsung Smart TV ══ -->
+    <div class="panel" id="panel-samsung">
+      <div class="device-header">
+        <span class="device-emoji">📺</span>
+        <div class="device-title">Samsung Smart TV</div>
+        <div class="device-sub">Installation du package .wgt Tizen. Modèles 2016 et ultérieurs. Nécessite un PC/Mac sur le même réseau Wi-Fi.</div>
+      </div>
+      <div class="compat">
+        <div class="compat-item">✓ Samsung 2016+ (Tizen 3.0+)</div>
+        <div class="compat-item">✓ Séries QLED / Neo QLED</div>
+        <div class="compat-item">✓ Séries 4K UHD 2016–2025</div>
+        <div class="compat-item">✓ The Frame / The Serif</div>
+      </div>
+      <div class="methods">
+        <div class="method-btn active" data-method="sam-auto">🖥 Installateur auto (recommandé)</div>
+        <div class="method-btn" data-method="sam-manual">🔧 Manuel (développeurs)</div>
+      </div>
+
+      <div class="method-panel active" id="method-sam-auto">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Activez le Mode Développeur sur la TV</div>
+              <div class="step-desc">
+                Sur la télécommande Samsung, appuyez sur <strong>Home / Menu</strong><br>
+                → <strong>Paramètres ⚙️ → Assistance → À propos de ce téléviseur</strong><br>
+                → Appuyez <strong>5 fois rapidement sur OK</strong> (ou entrez le code <strong>12345</strong> si une boîte de dialogue s'ouvre)<br>
+                → <strong>Mode développeur → ON</strong><br>
+                → Entrez l'<strong>adresse IP de votre PC</strong> (Windows : ouvrez cmd → tapez <code>ipconfig</code> → notez l'IP)<br>
+                → <strong>Redémarrez la TV</strong> (débranchez 10 secondes).
+              </div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Téléchargez le package d'installation sur votre PC</div>
+              <div class="step-desc">Sur votre PC, rendez-vous sur :<br><code>morpheus45.github.io/VOD/samsung-tv.html</code><br>et téléchargez le ZIP d'installation PIPSILY Samsung.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Lancez l'installateur</div>
+              <div class="step-desc">Extrayez le ZIP et lancez :<br>• <strong>Windows</strong> : double-cliquez <strong>INSTALLER.bat</strong><br>• <strong>Mac</strong> : ouvrez Terminal dans le dossier → <code>bash install.sh</code><br><br>L'installateur détecte votre TV automatiquement, envoie le .wgt et installe PIPSILY.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Ouvrez PIPSILY sur la TV</div>
+              <div class="step-desc">Sur la TV → <strong>Apps → Mes applications</strong>. PIPSILY apparaît dans la liste. Lancez-le et connectez-vous.</div>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <a href="./samsung-tv.html" class="dl-btn">📺 Guide complet Samsung TV</a>
+          <a href="https://github.com/morpheus45/VOD/releases/download/tv-v1/PIPSILY-TV-signed.wgt" class="dl-btn-ghost">⬇ .wgt direct</a>
+        </div>
+        <div class="tip"><strong>💡 Même réseau requis :</strong> PC et TV Samsung doivent être sur le même Wi-Fi ou Ethernet.</div>
+        <div class="warn"><strong>⚠ Mode développeur :</strong> Se désactive après quelques jours sur certains modèles. Si l'app disparaît, relancez simplement l'installateur.</div>
+      </div>
+
+      <div class="method-panel" id="method-sam-manual">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Activez le Mode Développeur (voir méthode auto — étape 1)</div>
+              <div class="step-desc">Même procédure que ci-dessus.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Installez Tizen Studio sur votre PC</div>
+              <div class="step-desc">Téléchargez depuis :<br><code>developer.samsung.com/tizen/download</code></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Connectez la TV dans Device Manager</div>
+              <div class="step-desc">Tizen Studio → <strong>Device Manager → Remote Device Manager</strong> → ajoutez l'IP de la TV → Connectez.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Installez le .wgt</div>
+              <div class="step-desc">Téléchargez le .wgt ci-dessous, puis dans Tizen Studio : clic droit sur la TV → <strong>Install Widget</strong> → sélectionnez le fichier.</div>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <a href="https://github.com/morpheus45/VOD/releases/download/tv-v1/PIPSILY-TV-signed.wgt" class="dl-btn">⬇ Télécharger PIPSILY-TV.wgt</a>
+        </div>
+        <div class="warn"><strong>⚠ Méthode avancée</strong> pour développeurs. Préférez l'installateur automatique.</div>
+      </div>
+    </div>
+
+    <!-- ══ Amazon Fire TV ══ -->
+    <div class="panel" id="panel-firetv">
+      <div class="device-header">
+        <span class="device-emoji">🔥</span>
+        <div class="device-title">Amazon Fire TV</div>
+        <div class="device-sub">Installation de l'APK PIPSILY via Downloader — 5 minutes, aucun PC requis.</div>
+      </div>
+      <div class="compat">
+        <div class="compat-item">✓ Fire TV Stick (toutes générations)</div>
+        <div class="compat-item">✓ Fire TV Stick 4K / 4K Max</div>
+        <div class="compat-item">✓ Fire TV Cube</div>
+        <div class="compat-item">✓ Fire TV Edition (Toshiba, Grundig, JVC…)</div>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Activez les apps de sources inconnues</div>
+            <div class="step-desc"><strong>Paramètres → Mon Fire TV → Options pour les développeurs</strong><br>→ Activez <strong>« Apps de sources inconnues »</strong>.<br><br>Sur Fire TV récents : <strong>Paramètres → Préférences → Confidentialité → Apps de sources inconnues</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Installez « Downloader » depuis l'App Store Amazon</div>
+            <div class="step-desc">Recherchez <strong>Downloader</strong> (icône orange, AFTVnews) → Installez. Gratuit.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Entrez l'URL dans Downloader</div>
+            <div class="step-desc">Ouvrez Downloader → dans le champ URL :<br><code>bit.ly/pipsily-apk</code><br>Appuyez sur <strong>Go</strong> (~8 Mo à télécharger).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Installez l'APK</div>
+            <div class="step-desc">Une fois téléchargé → <strong>Install</strong> → si Amazon affiche un avertissement → <strong>Installer quand même</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Épinglez sur l'écran d'accueil</div>
+            <div class="step-desc">Accueil → <strong>Applications → Voir toutes</strong> → PIPSILY → maintenez la sélection → <strong>Passer en tête de liste</strong>.</div>
+          </div>
+        </div>
+      </div>
+      <div class="info"><strong>✓ URL alternative :</strong><br><code>github.com/morpheus45/VOD/releases/download/v24/PIPSILY.apk</code></div>
+      <div class="tip"><strong>💡 Mise à jour :</strong> Une notification apparaît dans l'app quand une nouvelle version est dispo. Répétez les étapes 3–4.</div>
+    </div>
+
+    <!-- ══ Apple TV ══ -->
+    <div class="panel" id="panel-appletv">
+      <div class="device-header">
+        <span class="device-emoji">🍏</span>
+        <div class="device-title">Apple TV</div>
+        <div class="device-sub">Diffusez PIPSILY sur Apple TV via AirPlay depuis votre iPhone ou iPad. Aucune installation sur la TV.</div>
+      </div>
+      <div class="compat">
+        <div class="compat-item">✓ Apple TV HD (4e gen)</div>
+        <div class="compat-item">✓ Apple TV 4K (1re, 2e, 3e gen)</div>
+        <div class="compat-item">✓ iPhone / iPad avec iOS 12+</div>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Installez PIPSILY sur votre iPhone/iPad</div>
+            <div class="step-desc">Suivez d'abord le guide <strong>iPhone / iPad</strong> (onglet 🍎) pour ajouter PIPSILY à votre écran d'accueil.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Même réseau Wi-Fi</div>
+            <div class="step-desc">iPhone/iPad et Apple TV doivent être sur le <strong>même réseau Wi-Fi</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Option A — Miroir d'écran complet</div>
+            <div class="step-desc">Sur iPhone : <strong>Centre de contrôle</strong> (glissez depuis le coin haut droit) → <strong>Miroir d'écran</strong> → sélectionnez votre <strong>Apple TV</strong>.<br>Toute l'interface PIPSILY s'affiche sur la TV.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Option B — AirPlay vidéo uniquement</div>
+            <div class="step-desc">Dans le lecteur PIPSILY, appuyez sur l'icône <strong>AirPlay</strong> (📡 rectangle + triangle) → sélectionnez votre Apple TV.<br>La vidéo bascule sur la TV en qualité maximale. Votre iPhone devient télécommande.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Posez votre téléphone</div>
+            <div class="step-desc">Une fois la lecture lancée, vous pouvez poser votre iPhone — la diffusion continue indépendamment.</div>
+          </div>
+        </div>
+      </div>
+      <div class="tip"><strong>💡 Recommandation :</strong> Utilisez le <strong>Miroir d'écran</strong> pour naviguer dans le catalogue depuis la TV. Utilisez <strong>AirPlay vidéo</strong> pour la meilleure qualité en lecture.</div>
+      <div class="warn"><strong>⚠ AirPlay absent ?</strong> Vérifiez que les deux appareils sont sur le même Wi-Fi et que AirPlay est activé sur l'Apple TV (Paramètres → AirPlay et HomeKit).</div>
+    </div>
+
+    <!-- ══ PC / Mac ══ -->
+    <div class="panel" id="panel-pc">
+      <div class="device-header">
+        <span class="device-emoji">💻</span>
+        <div class="device-title">PC &amp; Mac</div>
+        <div class="device-sub">Accédez directement depuis votre navigateur, ou installez PIPSILY comme application de bureau (PWA).</div>
+      </div>
+      <div class="compat">
+        <div class="compat-item">✓ Windows 10 / 11</div>
+        <div class="compat-item">✓ macOS 10.15+</div>
+        <div class="compat-item">✓ Chrome / Edge (PWA)</div>
+        <div class="compat-item">✓ Firefox / Safari (navigateur)</div>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Ouvrez Chrome ou Edge</div>
+            <div class="step-desc">Pour l'installation en application de bureau, utilisez <strong>Chrome</strong> ou <strong>Edge</strong>. Firefox et Safari fonctionnent aussi sans installation.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Accédez à PIPSILY</div>
+            <div class="step-desc">Dans la barre d'adresse :<br><code>morpheus45.github.io/VOD</code></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Installez comme application (Chrome / Edge)</div>
+            <div class="step-desc">Cliquez sur l'icône <strong>⊕ Installer</strong> dans la barre d'adresse, ou dans le menu <strong>⋮ → Installer PIPSILY</strong>.<br>PIPSILY s'ouvre dans sa propre fenêtre sans barres de navigation.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Connectez-vous et profitez</div>
+            <div class="step-desc">Entrez votre email et mot de passe. Le catalogue se charge automatiquement.</div>
+          </div>
+        </div>
+      </div>
+      <div class="tip"><strong>💡 Raccourci :</strong> PIPSILY apparaît dans le menu Démarrer (Windows) ou Launchpad (Mac) après installation.</div>
+      <div class="tip"><strong>💡 Plein écran :</strong> Appuyez sur <strong>F11</strong> (Windows) ou <strong>Ctrl+Cmd+F</strong> (Mac).</div>
+    </div>
+
+  </div><!-- /tabs-wrap -->
+
+  <!-- FAQ -->
+  <div class="faq-wrap">
+    <hr class="faq-divider" />
+    <div class="faq-title">Questions fréquentes</div>
+    <div class="faq-item">
+      <button class="faq-q">Combien d'appareils puis-je utiliser ?<span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner"><strong>Solo 42€/an</strong> = 1 appareil enregistré · <strong>Multi 53€/an</strong> = 3 appareils simultanément · <strong>Illimité</strong> = appareils illimités. Gérez vos appareils depuis <strong>Mon compte</strong>.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">PIPSILY fonctionne-t-il sans internet ?<span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Non, une connexion internet active est requise pour diffuser. <strong>Wi-Fi recommandé</strong> pour une qualité HD/4K optimale. 4G/5G fonctionne aussi en HD.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">L'app se met-elle à jour automatiquement ?<span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Oui pour les versions PWA (iPhone, Android Chrome, PC) — mise à jour silencieuse à chaque lancement. Pour les APK (Android TV, Fire TV), une notification apparaît dans l'app.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Je ne peux pas me connecter, que faire ?<span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner">1. Vérifiez votre connexion internet.<br>2. Vérifiez que votre abonnement est actif (contactez l'admin).<br>3. Videz le cache du navigateur / de l'app.<br>4. Vérifiez que vous utilisez la bonne adresse e-mail.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Quelle est la qualité vidéo maximale ?<span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner">PIPSILY propose des contenus en <strong>SD, HD (1080p) et 4K</strong> selon la disponibilité. Filtrez par qualité depuis la barre de filtres dans l'application.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">L'APK est-il sécurisé ?<span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Oui. L'APK est distribué uniquement via <strong>GitHub Releases officiel</strong> (github.com/morpheus45/VOD/releases). Ne téléchargez jamais PIPSILY depuis une autre source.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Ma Samsung TV n'est pas compatible, que faire ?<span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Si votre TV date d'avant 2016 (Tizen &lt; 3.0), le .wgt n'est pas compatible. Utilisez un boîtier <strong>Chromecast with Google TV</strong>, un <strong>Fire TV Stick</strong> ou un <strong>Xiaomi Mi Box</strong> branché en HDMI.</div></div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        const id = tab.dataset.tab;
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById("panel-" + id)?.classList.add("active");
+        document.getElementById("tabs").scrollIntoView({ behavior:"smooth", block:"nearest" });
+      });
+    });
+
+    // Method switching (scoped to parent panel)
+    document.querySelectorAll(".method-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const panel = btn.closest(".panel");
+        const id    = btn.dataset.method;
+        panel.querySelectorAll(".method-btn").forEach(b => b.classList.remove("active"));
+        panel.querySelectorAll(".method-panel").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("method-" + id)?.classList.add("active");
+      });
+    });
+
+    // FAQ accordion
+    document.querySelectorAll(".faq-q").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const item   = btn.closest(".faq-item");
+        const isOpen = item.classList.contains("open");
+        document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
+        if(!isOpen) item.classList.add("open");
+      });
+    });
+
+    // Auto-select tab based on device
+    (function(){
+      const ua = navigator.userAgent;
+      let tab = null;
+      if(/Android.*TV|SmartTV|SMART-TV/i.test(ua))   tab = "androidtv";
+      else if(/Android/i.test(ua))                    tab = "android";
+      else if(/Macintosh|Windows/i.test(ua))          tab = "pc";
+      // iPad/iPhone stays on default (iphone)
+      if(tab){
+        document.querySelector(".tab.active")?.classList.remove("active");
+        document.querySelector(".panel.active")?.classList.remove("active");
+        const t = document.querySelector(`[data-tab="${tab}"]`);
+        if(t){ t.classList.add("active"); document.getElementById("panel-"+tab)?.classList.add("active"); }
+      }
+    })();
+  </script>
+</body>
+</html>

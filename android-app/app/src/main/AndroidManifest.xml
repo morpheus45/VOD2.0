@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Permissions réseau -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Installation de mises à jour APK -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <!-- Déclarer que l'app fonctionne sur TV (leanback) et sur phone -->
+    <uses-feature android:name="android.software.leanback"
+        android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:banner="@drawable/tv_banner"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Pipsiflix"
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config">
+
+        <!--
+          ╔══════════════════════════════════════════════════════╗
+          ║  Activité principale (phone + tablet)                ║
+          ╚══════════════════════════════════════════════════════╝
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:launchMode="singleTask"
+            android:screenOrientation="unspecified"
+            android:windowSoftInputMode="adjustResize">
+
+            <!-- Lanceur principal sur phone -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Deep links : ouvrir des URLs vidéo dans PIPSIFLIX -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                    android:host="morpheus45.github.io"
+                    android:pathPrefix="/VOD" />
+            </intent-filter>
+        </activity>
+
+        <!--
+          ╔══════════════════════════════════════════════════════╗
+          ║  Lecteur natif ExoPlayer                             ║
+          ╚══════════════════════════════════════════════════════╝
+        -->
+        <activity
+            android:name=".PlayerActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:launchMode="singleTop"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.Pipsiflix.TV" />
+
+        <!--
+          ╔══════════════════════════════════════════════════════╗
+          ║  Activité TV (Android TV / Google TV)                ║
+          ╚══════════════════════════════════════════════════════╝
+        -->
+        <activity
+            android:name=".TvActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Pipsiflix.TV">
+
+            <!-- Lanceur Leanback (icône sur l'écran d'accueil Android TV) -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- FileProvider : partage l'APK téléchargé avec l'installeur système -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.pipsiflix.app.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+    </application>
+</manifest>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <script>
+    /* Routage interface : si l'utilisateur a choisi Cosmos TV dans les réglages,
+       on bascule AVANT de charger l'app Xstream (l'auth est gérée par cosmos.html). */
+    try{ if(localStorage.getItem('pf_theme')==='cosmos'){ location.replace('./cosmos.html'); } }catch(e){}
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Lecteur IPTV pour films et séries" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PIPSILY" />
+  <meta name="application-name" content="PIPSILY" />
+  <meta name="msapplication-TileColor" content="#0f172a" />
+  <!-- iOS : empêcher la détection auto des numéros/dates/adresses -->
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
+  <title>PIPSILY</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <!-- Typographie premium (taste-skill) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" />
+  <link rel="icon" href="./icons/icon-192.png" type="image/png" />
+  <link rel="shortcut icon" href="./icons/icon-192.png" type="image/png" />
+  <!-- Icône iOS (180×180 recommandé) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-192.png" />
+  <!-- ══ Splash screens iOS ══ -->
+  <!-- iPhone SE / 8 (750×1334 @2x) -->
+  <link rel="apple-touch-startup-image"
+        media="(device-width:375px) and (device-height:667px) and (-webkit-device-pixel-ratio:2) and (orientation:portrait)"
+        href="./icons/splash/splash-750x1334.png" />
+  <!-- iPhone 12 / 13 (1170×2532 @3x) -->
+  <link rel="apple-touch-startup-image"
+        media="(device-width:390px) and (device-height:844px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)"
+        href="./icons/splash/splash-1170x2532.png" />
+  <!-- iPhone 14 / 15 / 16 (1179×2556 @3x) -->
+  <link rel="apple-touch-startup-image"
+        media="(device-width:393px) and (device-height:852px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)"
+        href="./icons/splash/splash-1179x2556.png" />
+  <!-- iPhone 14 Plus / 15 Plus / 16 Plus (1290×2796 @3x) -->
+  <link rel="apple-touch-startup-image"
+        media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)"
+        href="./icons/splash/splash-1290x2796.png" />
+  <!-- iPhone 16 Pro Max (1320×2868 @3x) -->
+  <link rel="apple-touch-startup-image"
+        media="(device-width:440px) and (device-height:956px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)"
+        href="./icons/splash/splash-1320x2868.png" />
+  <!-- iPad Pro 11" (1668×2388 @2x) -->
+  <link rel="apple-touch-startup-image"
+        media="(device-width:834px) and (device-height:1194px) and (-webkit-device-pixel-ratio:2) and (orientation:portrait)"
+        href="./icons/splash/splash-1668x2388.png" />
+  <!-- iPad Air / iPad Pro 13" / iPad 9–10 (2048×2732 @2x) -->
+  <link rel="apple-touch-startup-image"
+        media="(device-width:1024px) and (device-height:1366px) and (-webkit-device-pixel-ratio:2) and (orientation:portrait)"
+        href="./icons/splash/splash-2048x2732.png" />
+  <link rel="stylesheet" href="styles.css?v=106" />
+  <script>
+    /* Détection TV précoce — avant le 1er rendu, pour éviter tout flash */
+    if(/AndroidTV|GoogleTV|SmartTV/i.test(navigator.userAgent) ||
+       /\bTV\b/.test(navigator.userAgent)){
+      document.documentElement.classList.add('is-tv');
+    }
+  </script>
+</head>
+<body>
+  <!-- Fond ambiant : poster de la vignette focalisée, flouté plein écran -->
+  <div id="ambientBg" aria-hidden="true"></div>
+  <div id="scrollProg" aria-hidden="true"></div>
+  <div class="app-shell">
+
+    <header class="topbar">
+      <div class="topbar-brand-row">
+        <img src="./logo.svg" alt="PIPSILY" class="brand-logo" />
+        <div class="topbar-user-btns" id="topbarUserBtns" style="display:none">
+          <a href="./admin.html"   class="user-btn user-btn--admin" id="adminBtn"   style="display:none">⚙ Admin</a>
+          <a href="./install.html" class="user-btn" title="Installer sur TV / mobile">📲</a>
+          <a href="./account.html" class="user-btn user-btn--account" id="accountBtn">👤</a>
+        </div>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn active" data-type="vod">🎬 Films</button>
+        <button class="nav-btn"        data-type="series">📺 Séries</button>
+        <button class="nav-btn"        data-type="live">📡 TV</button>
+      </div>
+    </header>
+
+    <section class="sticky-controls">
+      <div class="controls-grid controls-grid--four">
+        <select id="categorySelect">
+          <option value="">Toutes les catégories</option>
+        </select>
+        <input  id="searchInput"   type="text" placeholder="Rechercher un titre…" autocomplete="off" />
+        <div id="qualityPills" class="quality-pills">
+          <button class="quality-pill quality-pill--active" data-q="">Tout</button>
+          <button class="quality-pill" data-q="4K">4K</button>
+          <button class="quality-pill" data-q="HD">HD</button>
+          <button class="quality-pill" data-q="SD">SD</button>
+          <button class="quality-pill" data-q="Autres">Autres</button>
+          <button class="quality-pill fav-pill" id="favFilterBtn">❤️ Favoris</button>
+        </div>
+        <!-- Pills région — visibles uniquement sur l'onglet TV Live -->
+        <div id="regionPills" class="quality-pills" hidden></div>
+        <select id="sortSelect">
+          <option value="title">Titre A→Z</option>
+          <option value="category">Catégorie</option>
+          <option value="recent">Récents</option>
+        </select>
+      </div>
+    </section>
+
+    <main class="content">
+
+      <!-- Pills catégories (Films / Séries — masqué pour Live) -->
+      <div id="catPills" class="cat-pills" hidden></div>
+
+      <section class="hero" id="hero">
+        <div class="hero-text">
+          <h1 id="heroTitle">PIPSILY</h1>
+          <p id="heroSubtitle"></p>
+          <div class="hero-stats">
+            <span id="statCount"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section Poursuivre (En cours + Favoris fusionnés) -->
+      <section id="poursuivreSection" class="section-block" hidden>
+        <div class="section-title-row">
+          <h2 class="section-h2">▶ Poursuivre</h2>
+        </div>
+        <div id="poursuivreRow" class="nou-row"></div>
+      </section>
+
+      <!-- Section Nouveautés -->
+      <section id="nouveautesSection" class="section-block" hidden>
+        <div class="section-title-row">
+          <h2 class="section-h2">🆕 Nouveautés</h2>
+          <span class="section-sub">Films récemment ajoutés</span>
+        </div>
+        <div id="nouveautesRow" class="nou-row"></div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-title-row">
+          <h2 id="catalogTitle">Catalogue</h2>
+          <span id="catalogCount">0 éléments</span>
+        </div>
+        <div id="grid" class="grid"></div>
+        <div id="gridSentinel" style="height:1px;margin-top:2rem;"></div>
+        <div id="emptyState" class="empty-state" hidden>Aucun élément trouvé.</div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Panneau séries — rendu dynamiquement par app.js -->
+  <div id="seriesPanel" class="series-panel" hidden></div>
+
+  <!-- Barre fixe Mettre à jour -->
+  <div id="updateBar" class="update-bar">
+    <div class="update-bar__left">
+      <span class="update-bar__icon">🔄</span>
+      <div class="update-bar__text">
+        <span class="update-bar__label">Catalogue</span>
+        <span class="update-bar__date" id="lastUpdateDate">Chargement…</span>
+      </div>
+    </div>
+    <button class="update-bar__btn" id="refreshCacheBtn" tabindex="0">
+      Mettre à jour
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       LECTEUR INTERNE — overlay plein écran sans navigation
+       ═══════════════════════════════════════════════════════ -->
+  <div id="pip-player" role="dialog" aria-modal="true" aria-label="Lecteur vidéo">
+
+    <!-- Topbar -->
+    <div class="pip-top">
+      <button id="pip-back" class="pip-icon-btn" type="button">← Retour</button>
+      <div class="pip-title-wrap">
+        <div id="pip-title" class="pip-title-text">Lecture</div>
+        <div id="pip-sub"   class="pip-sub-text"></div>
+      </div>
+      <button id="pip-fav" class="pip-icon-btn" type="button" aria-label="Favoris">♡</button>
+    </div>
+
+    <!-- Vidéo -->
+    <div class="pip-video-wrap">
+      <video id="pip-video" playsinline controls autoplay preload="metadata"></video>
+      <div id="pip-status" class="pip-status" hidden></div>
+    </div>
+
+    <!-- Navigation épisodes -->
+    <div class="pip-ep-nav" id="pip-ep-nav" hidden>
+      <button id="pip-prev" class="pip-ep-btn" type="button" disabled>⏮ Épisode précédent</button>
+      <button id="pip-next" class="pip-ep-btn pip-ep-btn--next" type="button" disabled>Épisode suivant ⏭</button>
+    </div>
+
+    <!-- Actions -->
+    <div class="pip-actions">
+      <button id="pip-fullscreen" type="button">⛶ Plein écran</button>
+      <button id="pip-copy"       type="button">⎘ Copier le lien</button>
+      <button id="pip-native"     type="button" class="pip-btn-primary">▶ Lecture native</button>
+    </div>
+
+    <!-- Boutons iOS / iPadOS — masqués sur les autres plateformes -->
+    <div class="pip-ios-actions" id="pip-ios-actions" hidden>
+      <p class="pip-ios-label">Ouvrir dans une app :</p>
+      <div class="pip-ios-btns">
+        <button id="pip-vlc"    type="button" class="pip-ios-btn">
+          <span class="pip-ios-icon">🎬</span>VLC
+        </button>
+        <button id="pip-infuse" type="button" class="pip-ios-btn">
+          <span class="pip-ios-icon">🔥</span>Infuse
+        </button>
+      </div>
+    </div>
+
+    <!-- Synopsis -->
+    <div class="pip-info">
+      <h2>Synopsis</h2>
+      <p id="pip-plot">Aucune description.</p>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest" onerror="console.warn('HLS.js indisponible')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="./auth.js"></script>
+  <script src="app.js?v=175"></script>
+  <script>
+    if("serviceWorker" in navigator){
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js", { scope:"./" })
+          .then(reg => {
+            console.log("SW:", reg.scope);
+            // Détecter quand un nouveau SW est en attente
+            reg.addEventListener("updatefound", () => {
+              const nw = reg.installing;
+              if(!nw) return;
+              nw.addEventListener("statechange", () => {
+                if(nw.state === "installed" && navigator.serviceWorker.controller)
+                  showUpdateBanner(); // défini dans app.js
+              });
+            });
+          })
+          .catch(e => console.warn("SW err:", e));
+        // Recharger la page si le SW demande RELOAD
+        navigator.serviceWorker.addEventListener("message", e => {
+          if(e.data?.type === "RELOAD") window.location.reload();
+        });
+      });
+    }
+  </script>
+  <script>
+    /* Ambient Glass : le poster de la vignette focalisée devient le fond */
+    (function(){
+      var bg = document.getElementById("ambientBg");
+      var last = "", t = null;
+      document.addEventListener("focusin", function(){
+        clearTimeout(t);
+        t = setTimeout(function(){
+          var ae = document.activeElement;
+          var card = ae && ae.closest ? ae.closest(".card,.nrow-card,.nou-card") : null;
+          var img = card ? card.querySelector("img") : null;
+          var src = img ? (img.currentSrc || img.src || "") : "";
+          if(!src || src === last) return;
+          last = src;
+          bg.style.backgroundImage = 'url("' + src + '")';
+          bg.classList.add("ambient-on");
+        }, 150);
+      });
+    })();
+  </script>
+  <script>
+    /* Néo Cinéma : topbar verre au scroll, progression de page, dock nav mobile */
+    (function(){
+      var tb = document.querySelector(".topbar");
+      var sp = document.getElementById("scrollProg");
+      window.addEventListener("scroll", function(){
+        if(tb) tb.classList.toggle("nc-scrolled", window.scrollY > 24);
+        if(sp){
+          var max = document.documentElement.scrollHeight - window.innerHeight;
+          sp.style.width = (max > 0 ? (window.scrollY / max * 100) : 0) + "%";
+        }
+      }, { passive:true });
+      /* Dock mobile : sortir la nav-row de la topbar (son backdrop-filter
+         piège le position:fixed — containing block) */
+      var mq = window.matchMedia("(max-width:740px)");
+      function placeNav(){
+        var nr = document.querySelector(".nav-row");
+        if(!nr || !tb) return;
+        var mobile = mq.matches && !document.documentElement.classList.contains("is-tv");
+        if(mobile){ if(nr.parentElement !== document.body) document.body.appendChild(nr); }
+        else      { if(nr.parentElement !== tb) tb.appendChild(nr); }
+      }
+      placeNav();
+      if(mq.addEventListener) mq.addEventListener("change", placeNav); else mq.addListener(placeNav);
+    })();
+  </script>
+</body>
+</html>

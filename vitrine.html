@@ -1,0 +1,519 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PIPSILY — Accès illimité à votre divertissement</title>
+  <meta name="description" content="Films, séries, sport en direct. Accès illimité sur tous vos appareils. Abonnez-vous dès 42€/an." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7B5FE8;
+      --blue:   #38A8E8;
+      --bg:     #05080f;
+      --card:   rgba(12,20,34,.9);
+      --border: rgba(255,255,255,.08);
+      --text:   #eef4ff;
+      --muted:  #7a9cc0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family:'Outfit','Segoe UI',system-ui,-apple-system,sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Bouton illimité invisible (top-right) ── */
+    #secretBtn {
+      position: fixed; top: 16px; right: 16px; z-index: 999;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: transparent; border: none; cursor: pointer;
+      opacity: 0.08; transition: opacity .3s;
+    }
+    #secretBtn:hover { opacity: 0.25; }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 32px;
+      background: rgba(5,8,15,.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-size: 20px; font-weight: 900; letter-spacing: -.3px;
+      background: linear-gradient(120deg, var(--purple), var(--blue));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-cta {
+      padding: 9px 22px; border-radius: 10px; font-size: 14px; font-weight: 700;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: #fff; text-decoration: none; transition: opacity .2s;
+    }
+    .nav-cta:hover { opacity: .85; }
+    .nav-login {
+      color: var(--muted); font-size: 14px; text-decoration: none;
+      margin-right: 16px; transition: color .2s;
+    }
+    .nav-login:hover { color: var(--text); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 90px 24px 80px;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 30% 0%, rgba(123,95,232,.18), transparent 55%),
+        radial-gradient(ellipse at 70% 0%, rgba(56,168,232,.13), transparent 55%);
+    }
+    .hero-tag {
+      display: inline-block; padding: 6px 16px; border-radius: 999px;
+      background: rgba(123,95,232,.12); border: 1px solid rgba(123,95,232,.3);
+      font-size: 12px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--purple); margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 62px); font-weight: 900; line-height: 1.1;
+      letter-spacing: -.02em; margin-bottom: 20px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: clamp(16px, 2.5vw, 20px); color: var(--muted);
+      max-width: 580px; margin: 0 auto 36px; line-height: 1.65;
+    }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 15px 32px; border-radius: 14px; font-size: 16px; font-weight: 700;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: #fff; text-decoration: none; transition: opacity .2s, transform .15s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-ghost {
+      padding: 15px 28px; border-radius: 14px; font-size: 16px; font-weight: 600;
+      border: 1.5px solid var(--border); color: var(--muted); text-decoration: none;
+      transition: all .2s;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,.2); color: var(--text); }
+
+    /* ── Devices strip ── */
+    .devices {
+      text-align: center; padding: 12px 24px 0;
+      font-size: 13px; color: var(--muted);
+    }
+    .devices span { margin: 0 8px; }
+
+    /* ── Features ── */
+    .features {
+      max-width: 960px; margin: 80px auto; padding: 0 24px;
+    }
+    .section-label {
+      text-align: center; font-size: 12px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .12em;
+      color: var(--purple); margin-bottom: 12px;
+    }
+    .section-title {
+      text-align: center; font-size: clamp(22px, 4vw, 34px);
+      font-weight: 800; margin-bottom: 48px;
+    }
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .feat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 18px; padding: 24px 20px;
+      transition: border-color .2s, transform .2s;
+    }
+    .feat-card:hover { border-color: rgba(123,95,232,.3); transform: translateY(-2px); }
+    .feat-icon { font-size: 32px; margin-bottom: 12px; }
+    .feat-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .feat-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ── Pricing ── */
+    .pricing {
+      max-width: 760px; margin: 0 auto 80px; padding: 0 24px;
+    }
+    .pricing-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    @media (max-width: 560px) { .pricing-grid { grid-template-columns: 1fr; } }
+
+    .plan-card {
+      background: var(--card); border: 1.5px solid var(--border);
+      border-radius: 22px; padding: 32px 28px;
+      position: relative; transition: border-color .25s, transform .2s;
+    }
+    .plan-card:hover { transform: translateY(-3px); }
+    .plan-card--popular {
+      border-color: var(--purple);
+      background: linear-gradient(160deg, rgba(123,95,232,.08), rgba(56,168,232,.05), var(--card));
+    }
+    .popular-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .08em;
+      text-transform: uppercase; padding: 5px 14px; border-radius: 999px;
+      white-space: nowrap;
+    }
+    .plan-name {
+      font-size: 13px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--muted); margin-bottom: 8px;
+    }
+    .plan-price {
+      font-size: 46px; font-weight: 900; line-height: 1;
+      margin-bottom: 4px;
+    }
+    .plan-price sup { font-size: 22px; vertical-align: top; margin-top: 8px; font-weight: 700; }
+    .plan-price sub { font-size: 16px; font-weight: 500; color: var(--muted); }
+    .plan-equiv {
+      font-size: 12px; color: var(--muted); margin-bottom: 24px;
+    }
+    .plan-sep {
+      height: 1px; background: var(--border); margin-bottom: 20px;
+    }
+    .plan-features { list-style: none; margin-bottom: 28px; }
+    .plan-features li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--muted); margin-bottom: 12px; line-height: 1.5;
+    }
+    .plan-features li strong { color: var(--text); }
+    .check { color: #6ef7b0; flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+    .plan-btn {
+      display: block; width: 100%; padding: 14px; border-radius: 13px;
+      text-align: center; font-size: 15px; font-weight: 700;
+      text-decoration: none; transition: opacity .2s, transform .15s;
+      border: none; cursor: pointer;
+    }
+    .plan-btn--primary {
+      background: linear-gradient(135deg, var(--purple), var(--blue)); color: #fff;
+    }
+    .plan-btn--ghost {
+      background: rgba(255,255,255,.06); border: 1.5px solid var(--border); color: var(--text);
+    }
+    .plan-btn:hover { opacity: .85; transform: translateY(-1px); }
+
+    /* ── Garantie ── */
+    .garantie {
+      text-align: center; padding: 0 24px 64px;
+      font-size: 13px; color: var(--muted); line-height: 1.7;
+    }
+    .garantie strong { color: var(--text); }
+
+    /* ── FAQ ── */
+    .faq-wrap {
+      max-width: 680px; margin: 0 auto 80px; padding: 0 24px;
+    }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-q {
+      width: 100%; background: none; border: none; color: var(--text);
+      font-size: 14px; font-weight: 600; padding: 18px 4px;
+      text-align: left; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .faq-q:hover { color: #b4a0f0; }
+    .faq-arrow { flex-shrink: 0; transition: transform .25s; font-size: 12px; color: var(--muted); }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
+    .faq-a {
+      max-height: 0; overflow: hidden; transition: max-height .3s ease;
+      color: var(--muted); font-size: 13px; line-height: 1.75;
+    }
+    .faq-item.open .faq-a { max-height: 300px; }
+    .faq-a-inner { padding: 0 4px 18px; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 32px 24px;
+      border-top: 1px solid var(--border);
+      font-size: 12px; color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ── Modale Illimité ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(5,8,15,.92); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #0c1422; border: 1px solid rgba(255,255,255,.1);
+      border-radius: 22px; padding: 36px 32px; max-width: 420px; width: 100%;
+      position: relative; animation: slideUp .25s ease;
+    }
+    @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; color: var(--muted); font-size: 20px;
+      cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .modal p { color: var(--muted); font-size: 13px; line-height: 1.65; margin-bottom: 20px; }
+    .modal input {
+      width: 100%; padding: 13px 16px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06);
+      color: var(--text); font-size: 15px; margin-bottom: 12px; outline: none;
+      transition: border-color .2s;
+    }
+    .modal input:focus { border-color: var(--purple); }
+    .modal-submit {
+      width: 100%; padding: 14px; border-radius: 13px; border: none;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: opacity .2s;
+    }
+    .modal-submit:hover { opacity: .85; }
+    .modal-submit:disabled { opacity: .4; cursor: default; }
+    .modal-msg { margin-top: 12px; font-size: 13px; text-align: center; min-height: 18px; }
+    .modal-msg.ok { color: #6ef7b0; }
+    .modal-msg.err { color: #ff8899; }
+
+  </style>
+</head>
+<body>
+
+  <!-- Bouton illimité discret (quasi invisible) -->
+  <button id="secretBtn" onclick="openModal()" title=""></button>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">PIPSILY</div>
+    <div style="display:flex;align-items:center">
+      <a href="./login.html" class="nav-login">Connexion</a>
+      <a href="#pricing" class="nav-cta">Voir les offres</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-tag">Streaming privé</div>
+    <h1>Regardez <span>tout ce que vous voulez</span>,<br>quand vous voulez</h1>
+    <p>Films, séries, et bien plus encore. Accès illimité sur tous vos appareils — TV, téléphone, tablette. Sans pub, sans engagement.</p>
+    <div class="hero-btns">
+      <a href="#pricing" class="btn-primary">🎬 Choisir mon offre</a>
+      <a href="./login.html" class="btn-ghost">J'ai déjà un compte</a>
+    </div>
+  </section>
+  <div class="devices">
+    <span>📱 iPhone</span>
+    <span>🤖 Android</span>
+    <span>📺 Samsung TV</span>
+    <span>🎮 Android TV</span>
+    <span>🔥 Fire TV</span>
+    <span>🍎 Apple TV</span>
+  </div>
+
+  <!-- Features -->
+  <section class="features">
+    <div class="section-label">Pourquoi PIPSILY</div>
+    <div class="section-title">Tout ce dont vous avez besoin</div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🎬</div>
+        <div class="feat-title">Catalogue complet</div>
+        <div class="feat-desc">Films, séries et contenus en continu. Le catalogue se met à jour régulièrement.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📺</div>
+        <div class="feat-title">Sur tous vos écrans</div>
+        <div class="feat-desc">TV Samsung, Android TV, Fire TV, iPhone, iPad, Android — un seul abonnement.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-title">Haute qualité</div>
+        <div class="feat-desc">Streaming fluide en HD. Adaptatif selon votre connexion pour ne jamais couper.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔒</div>
+        <div class="feat-title">Accès sécurisé</div>
+        <div class="feat-desc">Votre compte est protégé. Limite d'appareils intégrée pour sécuriser votre accès.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing" id="pricing">
+    <div class="section-label">Tarifs</div>
+    <div class="section-title">Simple. Transparent. Sans surprise.</div>
+    <div class="pricing-grid">
+
+      <!-- Solo -->
+      <div class="plan-card">
+        <div class="plan-name">Solo</div>
+        <div class="plan-price"><sup>€</sup>42<sub>/an</sub></div>
+        <div class="plan-equiv">soit 3,50 €/mois</div>
+        <div class="plan-sep"></div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span><div><strong>1 écran</strong> simultané</div></li>
+          <li><span class="check">✓</span><div><strong>1 appareil</strong> enregistré</div></li>
+          <li><span class="check">✓</span><div>Accès catalogue <strong>complet</strong></div></li>
+          <li><span class="check">✓</span><div>Renouvellement annuel</div></li>
+        </ul>
+        <a href="https://paypal.me/pipsily/42" target="_blank" rel="noopener" class="plan-btn plan-btn--ghost" id="btnSolo">
+          Payer 42 € →
+        </a>
+      </div>
+
+      <!-- Multi -->
+      <div class="plan-card plan-card--popular">
+        <div class="popular-badge">⭐ Le plus populaire</div>
+        <div class="plan-name">Multi</div>
+        <div class="plan-price"><sup>€</sup>53<sub>/an</sub></div>
+        <div class="plan-equiv">soit 4,42 €/mois</div>
+        <div class="plan-sep"></div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span><div><strong>3 écrans</strong> simultanés</div></li>
+          <li><span class="check">✓</span><div><strong>3 appareils</strong> enregistrés</div></li>
+          <li><span class="check">✓</span><div>Accès catalogue <strong>complet</strong></div></li>
+          <li><span class="check">✓</span><div>Parfait pour <strong>la famille</strong></div></li>
+        </ul>
+        <a href="https://paypal.me/pipsily/53" target="_blank" rel="noopener" class="plan-btn plan-btn--primary" id="btnMulti">
+          Payer 53 € →
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Garantie -->
+  <div class="garantie">
+    <strong>🔄 Renouvellement annuel.</strong> Votre accès est valable <strong>1 an</strong> à compter du paiement.<br>
+    À expiration, un rappel vous est envoyé pour renouveler. Aucun prélèvement automatique.
+  </div>
+
+  <!-- FAQ -->
+  <section class="faq-wrap">
+    <div class="section-label" style="text-align:center;margin-bottom:24px">Questions fréquentes</div>
+
+    <div class="faq-item">
+      <button class="faq-q">Comment accéder après le paiement ? <span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner">
+        Après le paiement PayPal, créez votre compte PIPSILY avec la même adresse email et validez le lien de confirmation. Votre accès est activé manuellement après vérification du paiement — généralement en quelques heures.
+      </div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Sur combien d'appareils puis-je regarder ? <span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner">
+        Avec Solo : 1 appareil enregistré, 1 écran à la fois. Avec Multi : 3 appareils enregistrés, jusqu'à 3 écrans simultanément. Vous pouvez gérer vos appareils depuis votre espace Mon compte.
+      </div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Est-ce que l'abonnement se renouvelle automatiquement ? <span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner">
+        Non. C'est un paiement unique valable 1 an. Aucun prélèvement automatique. À expiration, vous choisissez librement de renouveler ou non.
+      </div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Quel moyen de paiement est accepté ? <span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner">
+        Paiement sécurisé via <strong>PayPal</strong>. Vous êtes redirigé vers PayPal pour régler par carte bancaire ou solde PayPal. Vos données bancaires ne transitent jamais par nos serveurs. Les frais de gestion PayPal sont inclus dans le prix affiché.
+      </div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Je n'ai pas reçu mon accès après paiement — que faire ? <span class="faq-arrow">▼</span></button>
+      <div class="faq-a"><div class="faq-a-inner">
+        L'activation est manuelle — comptez quelques heures maximum. Vérifiez d'abord vos spams. Si vous n'avez toujours pas accès après 24h, connectez-vous et envoyez un message depuis votre compte — nous résoudrons le problème rapidement.
+      </div></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div style="margin-bottom:8px">
+      <strong style="background:linear-gradient(120deg,#7B5FE8,#38A8E8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">PIPSILY</strong>
+    </div>
+    <div>
+      <a href="./login.html">Connexion</a>
+      &nbsp;·&nbsp;
+      <a href="./install.html" style="pointer-events:none;opacity:.3">Guide d'installation</a>
+    </div>
+  </footer>
+
+  <!-- Modale Illimité -->
+  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div style="font-size:36px;margin-bottom:12px">⚡</div>
+      <h3>Accès Illimité</h3>
+      <p>Laissez votre email — nous vous contacterons pour discuter de votre offre personnalisée.</p>
+      <input type="email" id="illiEmail" placeholder="votre@email.com" />
+      <input type="text" id="illiNote" placeholder="Message (optionnel)" />
+      <button class="modal-submit" id="illiBtn" onclick="submitIllimite()">Envoyer la demande</button>
+      <div class="modal-msg" id="illiMsg"></div>
+    </div>
+  </div>
+
+  <script>
+    // ── FAQ ──
+    document.querySelectorAll(".faq-q").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const item = btn.closest(".faq-item");
+        const isOpen = item.classList.contains("open");
+        document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
+        if(!isOpen) item.classList.add("open");
+      });
+    });
+
+    // ── Modale Illimité ──
+    function openModal(){ document.getElementById("modalOverlay").classList.add("open"); }
+    function closeModal(){ document.getElementById("modalOverlay").classList.remove("open"); }
+
+    async function submitIllimite(){
+      const email = document.getElementById("illiEmail").value.trim();
+      const note  = document.getElementById("illiNote").value.trim();
+      const btn   = document.getElementById("illiBtn");
+      const msg   = document.getElementById("illiMsg");
+      if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        msg.textContent = "Adresse email invalide.";
+        msg.className = "modal-msg err";
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = "Envoi…";
+      msg.textContent = "";
+      try {
+        // Enregistrement dans Supabase (table contact_requests)
+        const A = window.PIPSILY_AUTH;
+        if(A?.supabase){
+          await A.supabase.from("contact_requests").insert({
+            email, note: note || null, plan: "unlimited", created_at: new Date().toISOString()
+          });
+        }
+        msg.textContent = "✅ Demande envoyée ! Nous vous répondrons sous 24h.";
+        msg.className = "modal-msg ok";
+        document.getElementById("illiEmail").value = "";
+        document.getElementById("illiNote").value = "";
+      } catch(e) {
+        // Fallback si Supabase non dispo : email mailto
+        window.location.href = `mailto:contact@pipsily.fr?subject=Demande%20acc%C3%A8s%20illimit%C3%A9&body=Email%3A%20${encodeURIComponent(email)}%0AMessage%3A%20${encodeURIComponent(note)}`;
+        msg.textContent = "✅ Votre client email s'est ouvert.";
+        msg.className = "modal-msg ok";
+      }
+      btn.disabled = false;
+      btn.textContent = "Envoyer la demande";
+    }
+
+  </script>
+
+  <!-- Supabase CDN (pour la modale illimité) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="./auth.js"></script>
+</body>
+</html>

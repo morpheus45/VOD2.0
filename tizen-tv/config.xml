@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets"
+        xmlns:tizen="http://tizen.org/ns/widgets"
+        id="http://morpheus45.com/pipsily"
+        version="1.0.0"
+        viewmodes="fullscreen">
+
+  <!-- ─── Application identity ─────────────────────────────────────── -->
+  <tizen:application id="com.morpheus45.pipsily"
+                     package="com.morpheus45"
+                     required_version="3.0"
+                     launch_mode="single"/>
+
+  <!-- ─── Display name & description ──────────────────────────────── -->
+  <name>PIPSILY TV</name>
+  <description>Lecteur IPTV – Films, Séries, TV en direct</description>
+
+  <!-- ─── Entry point ──────────────────────────────────────────────── -->
+  <tizen:content src="index.html"/>
+
+  <!-- ─── Icons ────────────────────────────────────────────────────── -->
+  <icon src="icon.png"       width="128"  height="128"/>
+  <icon src="icon_large.png" width="512"  height="512"/>
+
+  <!-- ─── Profile ──────────────────────────────────────────────────── -->
+  <tizen:profile name="tv"/>
+
+  <!-- ─── Features ─────────────────────────────────────────────────── -->
+  <feature name="http://tizen.org/feature/network.internet" required="true"/>
+
+  <!-- ─── Privileges ───────────────────────────────────────────────── -->
+  <tizen:privilege name="http://tizen.org/privilege/internet"/>
+  <tizen:privilege name="http://tizen.org/privilege/filesystem.read"/>
+  <tizen:privilege name="http://tizen.org/privilege/filesystem.write"/>
+  <tizen:privilege name="http://tizen.org/privilege/packagemanager.install"/>
+  <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
+  <tizen:privilege name="http://tizen.org/privilege/application.info"/>
+
+  <!-- ─── Allow-navigation (CDN + backend) ─────────────────────────── -->
+  <tizen:allow-navigation>
+    https://cdn.jsdelivr.net
+    https://*.supabase.co
+    https://*.supabase.in
+    https://ipapi.co
+    https://morpheus45.github.io
+    https://github.com
+  </tizen:allow-navigation>
+
+  <!-- ─── Tizen Web App Settings ───────────────────────────────────── -->
+  <tizen:metadata key="http://samsung.com/tv/SmartTV/UseSharedWorker" value="false"/>
+
+  <tizen:setting background-support="disable"
+                 encryption="disable"
+                 install-location="auto"
+                 hwkey-event="enable"/>
+
+</widget>

@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>PIPSILY — Administration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" />
+  <style>
+    *{ box-sizing:border-box; margin:0; padding:0 }
+    body{
+      min-height:100vh;
+      background:
+        radial-gradient(ellipse at 10% 0%,rgba(59,124,244,.15),transparent 40%),
+        radial-gradient(ellipse at 90% 0%,rgba(123,95,232,.12),transparent 40%),
+        #05080f;
+      font-family:'Outfit','Segoe UI',system-ui,-apple-system,sans-serif;
+      color:#eef4ff;
+    }
+    .topbar{
+      display:flex; align-items:center; gap:12px; padding:14px 20px;
+      background:rgba(5,8,15,.92); border-bottom:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(20px);
+    }
+    .logo-text{
+      font-size:20px; font-weight:900;
+      background:linear-gradient(120deg,#7B5FE8,#38A8E8,#fff);
+      -webkit-background-clip:text; color:transparent;
+    }
+    .admin-badge{
+      padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800;
+      background:rgba(59,124,244,.2); border:1px solid rgba(59,124,244,.4); color:#82b4ff;
+      letter-spacing:.06em;
+    }
+    .back-btn{
+      margin-left:auto; display:flex; align-items:center; gap:6px;
+      padding:8px 14px; border-radius:10px;
+      border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05);
+      color:#7a9cc0; font-size:13px; font-weight:600; cursor:pointer;
+      text-decoration:none; transition:all .15s;
+    }
+    .back-btn:hover{ background:rgba(255,255,255,.1); color:#eef4ff }
+    .page{ max-width:900px; margin:0 auto; padding:24px 16px 80px }
+    .stats-grid{
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+      gap:12px; margin-bottom:24px;
+    }
+    .stat-card{
+      background:rgba(12,20,34,.85); border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; padding:18px; text-align:center;
+    }
+    .stat-num{ font-size:28px; font-weight:900; margin-bottom:4px }
+    .stat-label{ font-size:12px; color:#7a9cc0; font-weight:600; letter-spacing:.03em }
+    .stat-card--accent .stat-num{ color:#38A8E8 }
+    .stat-card--blue   .stat-num{ color:#82b4ff }
+    .stat-card--green  .stat-num{ color:#6ef7b0 }
+    .stat-card--red    .stat-num{ color:#ff8899 }
+    .card{
+      background:rgba(12,20,34,.85); border:1px solid rgba(255,255,255,.08);
+      border-radius:18px; padding:20px; margin-bottom:16px; overflow-x:auto;
+    }
+    .card-header{
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:16px; flex-wrap:wrap; gap:10px;
+    }
+    .card-title{
+      font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.08em;
+      color:#7a9cc0; display:flex; align-items:center; gap:8px;
+    }
+    .card-title::before{
+      content:''; width:3px; height:14px; border-radius:2px;
+      background:linear-gradient(180deg,#7B5FE8,#38A8E8); display:block;
+    }
+    /* ── Formulaire création compte ── */
+    .form-create{ display:flex; flex-direction:column; gap:10px }
+    .form-create input, .form-create select{
+      width:100%; padding:12px 14px; border-radius:10px;
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.06); color:#eef4ff; font-size:14px; outline:none;
+      box-sizing:border-box;
+    }
+    .form-create input:focus, .form-create select:focus{
+      border-color:#7B5FE8; box-shadow:0 0 0 3px rgba(123,95,232,.2)
+    }
+    /* ── Badges ── */
+    .badge{
+      display:inline-flex; align-items:center; gap:4px;
+      padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700;
+      white-space:nowrap;
+    }
+    .badge--active   { background:rgba(100,220,140,.15); color:#6ef7b0; border:1px solid rgba(100,220,140,.25) }
+    .badge--expired  { background:rgba(232,51,74,.15);   color:#ff8899; border:1px solid rgba(232,51,74,.25) }
+    .badge--pending  { background:rgba(56,168,232,.12);   color:#38A8E8; border:1px solid rgba(56,168,232,.25) }
+    .badge--admin    { background:rgba(59,124,244,.15);  color:#82b4ff; border:1px solid rgba(59,124,244,.25) }
+    .badge--unlimited{ background:rgba(100,220,140,.15); color:#6ef7b0; border:1px solid rgba(100,220,140,.25) }
+    /* ── Carte utilisateur ── */
+    .user-card{
+      background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07);
+      border-radius:14px; padding:14px 16px; margin-bottom:10px;
+      transition:background .15s;
+    }
+    .user-card:hover{ background:rgba(255,255,255,.055) }
+    .user-card__top{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .user-card__email{
+      font-size:13px; font-weight:700; color:#eef4ff; flex:1; min-width:0;
+      word-break:break-all;
+    }
+    .user-card__meta{
+      display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+      font-size:12px; color:#7a9cc0; margin-bottom:10px;
+    }
+    .user-card__meta span{ display:flex; align-items:center; gap:3px }
+    .user-card__actions{ display:flex; flex-wrap:wrap; gap:8px }
+    .action-btn{
+      flex:1; min-width:70px; padding:9px 10px; border-radius:9px; border:none;
+      cursor:pointer; font-size:12px; font-weight:700; transition:opacity .15s;
+      white-space:nowrap; text-align:center;
+    }
+    .action-btn--green{ background:rgba(100,220,140,.15); color:#6ef7b0; border:1px solid rgba(100,220,140,.3) }
+    .action-btn--red  { background:rgba(232,51,74,.15);   color:#ff8899; border:1px solid rgba(232,51,74,.3) }
+    .action-btn--blue { background:rgba(59,124,244,.15);  color:#82b4ff; border:1px solid rgba(59,124,244,.3) }
+    .action-btn--gold { background:rgba(56,168,232,.15);   color:#38A8E8; border:1px solid rgba(56,168,232,.3) }
+    .action-btn:hover{ opacity:.75 }
+    .action-btn:disabled{ opacity:.3; cursor:default }
+    /* ── Barre de recherche ── */
+    .search-bar{
+      width:100%; padding:11px 14px; border-radius:10px; box-sizing:border-box;
+      border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.06);
+      color:#eef4ff; font-size:13px; outline:none; margin-bottom:12px;
+    }
+    .search-bar:focus{ border-color:#7B5FE8 }
+    /* ── Boutons généraux ── */
+    .btn{ padding:12px 18px; border-radius:10px; border:none; cursor:pointer;
+      font-size:14px; font-weight:700; width:100%; box-sizing:border-box }
+    .btn-primary{ background:linear-gradient(135deg,#7B5FE8,#38A8E8); color:#fff }
+    .btn:disabled{ opacity:.5; cursor:default }
+    .msg{ padding:10px 14px; border-radius:10px; font-size:13px; margin-top:12px; display:none }
+    .msg--success{ background:rgba(100,220,140,.1); border:1px solid rgba(100,220,140,.3); color:#7ef7b0 }
+    .msg--error{ background:rgba(232,51,74,.12); border:1px solid rgba(232,51,74,.3); color:#ff8899 }
+    .loading{ text-align:center; padding:40px; color:#7a9cc0 }
+    /* ── Stats grid ── */
+    .stats-grid{ grid-template-columns:repeat(auto-fill,minmax(140px,1fr)) }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <img src="./logo.svg" alt="PIPSILY" style="height:34px;width:auto;display:block;filter:drop-shadow(0 0 8px rgba(123,111,232,.35))" />
+    <span class="admin-badge">ADMIN</span>
+    <a href="./index.html" class="back-btn">← App</a>
+  </div>
+
+  <div class="page">
+    <div id="adminContent" class="loading">Vérification des droits…</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="./auth.js"></script>
+  <script>
+    const A = window.PIPSILY_AUTH || {};
+    const _esc = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    if(!A.getSession){ document.getElementById("adminContent").innerHTML = '<div style="text-align:center;padding:60px;color:#ff8899">⚠ Service non disponible — rechargez la page.</div>'; throw new Error("PIPSILY_AUTH manquant"); }
+    let _allUsers = [];
+    let _session  = null;
+
+    async function init(){
+      try {
+        _session = await A.getSession();
+        if(!_session){ window.location.href = "./login.html"; return; }
+        const prof = await A.getProfile(_session.user.id);
+        // Accès admin si : plan DB = "admin" OU email = ADMIN_EMAIL (insensible à la casse)
+        const _isAdmin = (prof?.plan === "admin") ||
+          ((_session.user.email || "").toLowerCase() === (A.ADMIN_EMAIL || "").toLowerCase());
+        if(!_isAdmin){
+          document.getElementById("adminContent").innerHTML =
+            '<div style="text-align:center;padding:60px;color:#ff8899">⛔ Accès refusé</div>';
+          return;
+        }
+        // Toujours forcer plan = 'admin' en DB (indispensable pour les politiques RLS)
+        // getProfile() renvoie plan:"admin" côté client (via email match) même si la DB dit "pending"
+        // → le upsert doit toujours s'exécuter pour que RLS "admin all profiles" fonctionne
+        if(A.supabase){
+          try {
+            await A.supabase.from("profiles")
+              .upsert({ id: _session.user.id, email: _session.user.email, plan: "admin", devices_allowed: 999 });
+          } catch(e){ console.warn("[admin] upsert plan admin :", e.message); }
+        }
+        await loadAdmin();
+      } catch(e) {
+        document.getElementById("adminContent").innerHTML =
+          `<div style="text-align:center;padding:60px;color:#ff8899">⚠ Erreur : ${_esc(e.message||String(e))}<br><br><a href="./admin.html" style="color:#82b4ff;font-size:13px">Réessayer</a></div>`;
+      }
+    }
+
+    async function loadAdmin(){
+      if(!A.supabase){
+        document.getElementById("adminContent").innerHTML = `
+          <div style="background:rgba(56,168,232,.08);border:1px solid rgba(56,168,232,.25);
+            border-radius:16px;padding:30px;text-align:center;max-width:500px;margin:40px auto">
+            <div style="font-size:40px;margin-bottom:12px">⚙️</div>
+            <div style="font-size:16px;font-weight:700;color:#38A8E8;margin-bottom:10px">Supabase non configuré</div>
+            <p style="color:#7a9cc0;font-size:13px;line-height:1.6;margin:0 0 16px">
+              La base de données n'est pas encore connectée.<br>
+              Double-cliquez sur <strong style="color:#eef4ff">SETUP.bat</strong> dans le dossier VOD
+              pour configurer automatiquement Supabase (2 min).
+            </p>
+          </div>`;
+        return;
+      }
+      let users = [], payments = [], devices = [], sessions = [];
+      const errs = [];
+
+      // Wrapper qui loggue les erreurs Supabase (ne throw pas, retourne toujours un tableau)
+      const sq = async (label, fn) => {
+        try {
+          const r = await fn();
+          if(r.error){ errs.push(`${label} : ${r.error.message || JSON.stringify(r.error)}`); return []; }
+          return r.data || [];
+        } catch(e){ errs.push(`${label} (exception) : ${e.message||e}`); return []; }
+      };
+
+      [users, payments, devices] = await Promise.all([
+        sq("profiles", () => A.supabase.from("profiles").select("*").order("created_at", { ascending: false })),
+        sq("payments", () => A.supabase.from("payments").select("*").order("created_at", { ascending: false })),
+        sq("devices",  () => A.supabase.from("devices").select("*"))
+      ]);
+
+      // Sessions avec fallback sans order()
+      const rS = await A.supabase.from("sessions").select("*").order("last_seen", { ascending: false });
+      if(!rS.error){ sessions = rS.data || []; }
+      else {
+        const rS2 = await A.supabase.from("sessions").select("*");
+        sessions = rS2.data || [];
+      }
+
+      // Afficher un bandeau d'erreur si certaines tables ont échoué
+      if(errs.length){
+        const banner = document.createElement("div");
+        banner.style.cssText = "background:rgba(232,51,74,.12);border:1px solid rgba(232,51,74,.3);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#ff8899;white-space:pre-wrap";
+        banner.textContent = "⚠ Erreurs de chargement (données partielles) :\n" + errs.join("\n");
+        document.getElementById("adminContent").prepend(banner);
+        console.error("[admin] Erreurs requêtes :", errs);
+      }
+
+      _allUsers           = users;
+      window._allDevices  = devices;
+      window._allSessions = sessions;
+      window._allPayments = payments;
+      renderAdmin(users, payments, devices, sessions);
+    }
+
+    function fmtDate(iso){ if(!iso) return "—"; return new Date(iso).toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"}) }
+    function fmtMoney(n){ return typeof n === "number" ? n.toFixed(2).replace(".",",")+" €" : "—" }
+
+    function statusBadge(p){
+      if(p.plan==="admin")     return '<span class="badge badge--admin">⚡ Admin</span>';
+      if(p.plan==="unlimited") return '<span class="badge badge--unlimited">∞ Illimité</span>';
+      const exp = p.subscription_expires_at ? new Date(p.subscription_expires_at) : null;
+      if(exp && exp > new Date()) return '<span class="badge badge--active">✓ Actif</span>';
+      if(exp) return '<span class="badge badge--expired">Expiré</span>';
+      return '<span class="badge badge--pending">⏳ En attente</span>';
+    }
+
+    function calcAnnualRevenue(users){
+      // Calcul basé sur les abonnements annuels actifs
+      return users.reduce((sum, u) => {
+        if(u.plan === "admin" || u.plan === "unlimited" || u.plan === "pending") return sum;
+        const exp = u.subscription_expires_at ? new Date(u.subscription_expires_at) : null;
+        if(!exp || exp < new Date()) return sum;
+        // Déterminer le plan selon devices_allowed (3 → Multi 53€, 1 → Solo 42€)
+        return sum + (u.devices_allowed >= 3 ? 53 : 42);
+      }, 0);
+    }
+
+    function renderAdmin(users, payments, devices, sessions){
+      const now = new Date();
+      const active   = users.filter(u => {
+        if(u.plan==="admin"||u.plan==="unlimited") return false;
+        const exp = u.subscription_expires_at ? new Date(u.subscription_expires_at) : null;
+        return exp && exp > now;
+      });
+      const pending  = users.filter(u => u.plan === "pending" || (!u.subscription_expires_at && u.plan === "active"));
+      const expired  = users.filter(u => {
+        if(u.plan==="admin"||u.plan==="unlimited") return false;
+        const exp = u.subscription_expires_at ? new Date(u.subscription_expires_at) : null;
+        return !exp || exp < now;
+      });
+      const revenue   = calcAnnualRevenue(users);
+      const activeCutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+      const connected = (sessions||[]).filter(s => s.last_seen && s.last_seen > activeCutoff).length;
+      // Paiements en attente de confirmation (Wero déclaré par utilisateur)
+      const pendingPayments = (payments||[]).filter(p => !p.confirmed_at);
+
+      document.getElementById("adminContent").innerHTML = `
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card stat-card--blue">
+            <div class="stat-num">${users.length}</div>
+            <div class="stat-label">Comptes total</div>
+          </div>
+          <div class="stat-card stat-card--green">
+            <div class="stat-num">${active.length}</div>
+            <div class="stat-label">Abonnés actifs</div>
+          </div>
+          <div class="stat-card stat-card--red">
+            <div class="stat-num">${expired.length}</div>
+            <div class="stat-label">Expirés</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">${pending.length}</div>
+            <div class="stat-label">En attente</div>
+          </div>
+          <div class="stat-card stat-card--blue">
+            <div class="stat-num">${connected}</div>
+            <div class="stat-label">Connectés</div>
+          </div>
+          <div class="stat-card stat-card--accent">
+            <div class="stat-num">${fmtMoney(revenue)}</div>
+            <div class="stat-label">CA annuel</div>
+          </div>
+          <div class="stat-card stat-card--accent">
+            <div class="stat-num">${fmtMoney(revenue / 12)}</div>
+            <div class="stat-label">CA mensuel (est.)</div>
+          </div>
+        </div>
+
+        ${pendingPayments.length === 0 ? "" : `
+        <!-- ── Paiements Wero en attente ── -->
+        <div class="card" style="border-color:rgba(56,168,232,.4);background:rgba(56,168,232,.05)">
+          <div class="card-title" style="color:#38A8E8">
+            💰 Paiements en attente de confirmation (${pendingPayments.length})
+          </div>
+          <p style="font-size:13px;color:#7a9cc0;margin-bottom:14px;line-height:1.5">
+            Vérifiez la réception sur votre application Wero, puis cliquez sur
+            <strong style="color:#6ef7b0">Confirmer</strong> pour activer le compte 30 jours.
+          </p>
+          ${pendingPayments.map(p => {
+            const u = users.find(x => x.id === p.user_id);
+            return `
+              <div style="display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:8px;
+                border-radius:12px;background:rgba(56,168,232,.08);border:1px solid rgba(56,168,232,.25);
+                flex-wrap:wrap">
+                <div style="flex:1;min-width:180px">
+                  <div style="font-size:13px;font-weight:700;color:#eef4ff">${_esc(u?.email || p.user_id)}</div>
+                  <div style="font-size:11px;color:#7a9cc0;margin-top:3px">
+                    Déclaré ${fmtRelative(p.created_at)} · ${_esc(p.notes)}
+                  </div>
+                </div>
+                <div style="font-size:18px;font-weight:900;color:#6ef7b0">${fmtMoney(p.amount)}</div>
+                <div style="display:flex;gap:6px">
+                  <button class="action-btn action-btn--green" style="flex:0 0 auto;padding:9px 16px"
+                    onclick="confirmPayment('${p.id}','${p.user_id}',${p.amount})">
+                    ✓ Confirmer
+                  </button>
+                  <button class="action-btn action-btn--red" style="flex:0 0 auto;padding:9px 12px"
+                    onclick="rejectPayment('${p.id}')">
+                    ✕ Rejeter
+                  </button>
+                </div>
+              </div>`;
+          }).join("")}
+        </div>
+        `}
+
+        <!-- Créer un compte -->
+        <div class="card">
+          <div class="card-title">Créer un compte</div>
+          <div class="form-create">
+            <input type="email" id="newEmail" placeholder="email@exemple.com" autocomplete="off" />
+            <input type="password" id="newPw" placeholder="Mot de passe provisoire" autocomplete="new-password" />
+            <select id="newPlan">
+              <option value="solo">Solo 42 €/an — 1 appareil (365 j)</option>
+              <option value="multi">Multi 53 €/an — 3 appareils (365 j)</option>
+              <option value="unlimited">Illimité (sans expiration)</option>
+              <option value="admin">Admin</option>
+              <option value="test">Test (7 jours)</option>
+            </select>
+            <input type="date" id="newExpiry" title="Date d'expiration" />
+            <button class="btn btn-primary" onclick="createAccount()">Créer</button>
+          </div>
+          <div class="msg" id="createMsg"></div>
+        </div>
+
+        <!-- Abonnés -->
+        <div class="card">
+          <div class="card-title">Abonnés (${users.length})</div>
+          <input type="text" class="search-bar" id="userSearch" placeholder="Rechercher un e-mail…" oninput="filterUsers()" />
+          <div id="userCardList">
+            ${renderUserCards(users, devices, sessions||[])}
+          </div>
+        </div>
+      `;
+
+      // Auto-remplir la date d'expiration à 365 jours (plans annuels par défaut)
+      const d365 = new Date(); d365.setDate(d365.getDate()+365);
+      document.getElementById("newExpiry").value = d365.toISOString().slice(0,10);
+      // Mettre à jour la date selon le plan sélectionné
+      document.getElementById("newPlan").addEventListener("change", function(){
+        const inp = document.getElementById("newExpiry");
+        const d = new Date();
+        if(this.value==="solo"||this.value==="multi"){ d.setDate(d.getDate()+365); }
+        else if(this.value==="test"){ d.setDate(d.getDate()+7); }
+        else if(this.value==="unlimited"||this.value==="admin"){ inp.value=""; return; }
+        else { d.setDate(d.getDate()+30); }
+        inp.value = d.toISOString().slice(0,10);
+      });
+    }
+
+    function fmtRelative(iso){
+      if(!iso) return "—";
+      const diff = Date.now() - new Date(iso).getTime();
+      if(diff < 60000)   return "à l'instant";
+      if(diff < 3600000) return `il y a ${Math.round(diff/60000)} min`;
+      if(diff < 86400000)return `il y a ${Math.round(diff/3600000)} h`;
+      return `il y a ${Math.round(diff/86400000)} j`;
+    }
+
+    function renderUserCards(users, devices, sessions){
+      if(!users.length) return '<p style="text-align:center;color:#7a9cc0;padding:20px">Aucun utilisateur</p>';
+      return users.map(u => {
+        const exp      = u.subscription_expires_at ? new Date(u.subscription_expires_at) : null;
+        const userDevs = (window._allDevices || devices || []).filter(d=>d.user_id===u.id);
+        const userSess = (window._allSessions || sessions || []).filter(s=>s.user_id===u.id);
+        const devFees  = userDevs.reduce((s,d)=>s+(d.monthly_fee||0),0);
+        const monthly  = (u.plan==="admin"||u.plan==="unlimited"||u.plan==="pending") ? null :
+          (exp && exp > new Date() ? fmtMoney(4.99+devFees) : null);
+        const isMe     = (u.email||"").toLowerCase() === (A.ADMIN_EMAIL||"").toLowerCase();
+        const devLimit = u.plan==="admin"||u.plan==="unlimited" ? "∞" : (u.devices_allowed||1);
+        const isOnline = userSess.length > 0;
+
+        // Sessions actives avec géolocalisation
+        const sessHtml = userSess.length === 0 ? "" : `
+          <div style="margin:10px 0 4px;font-size:11px;font-weight:800;text-transform:uppercase;
+            letter-spacing:.06em;color:#4a6080">📡 Sessions actives (${userSess.length})</div>
+          ${userSess.map(s => `
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:6px;
+              border-radius:10px;background:rgba(100,220,140,.06);border:1px solid rgba(100,220,140,.15)">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:700;color:#eef4ff">${_esc(s.device_name||"Appareil")}</div>
+                <div style="font-size:11px;color:#4a6080;margin-top:2px">${_esc(s.device_id?.slice(0,8)||"") || ""}</div>
+                <div style="font-size:10px;color:#4a6080;margin-top:2px">Vu ${fmtRelative(s.last_seen)}</div>
+              </div>
+            </div>`).join("")}`;
+
+        return `
+          <div class="user-card" data-email="${(u.email||"").toLowerCase()}">
+            <div class="user-card__top">
+              <div class="user-card__email">
+                ${isOnline ? '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#6ef7b0;margin-right:6px;flex-shrink:0"></span>' : ''}
+                ${_esc(u.email||"?")}
+              </div>
+              ${statusBadge(u)}
+            </div>
+            <div class="user-card__meta">
+              ${exp ? `<span>📅 ${fmtDate(u.subscription_expires_at)}</span>` : ""}
+              <span>📱 ${userDevs.length}/${devLimit} appareils</span>
+              ${monthly ? `<span>💳 ${monthly}/mois</span>` : ""}
+            </div>
+            ${sessHtml}
+            ${isMe
+              ? `<div style="font-size:12px;color:#7a9cc0;padding:4px 0">Votre compte administrateur</div>`
+              : `<div class="user-card__actions">
+                  <button class="action-btn" style="background:rgba(110,247,176,.12);color:#6ef7b0;border:1px solid rgba(110,247,176,.3);font-weight:800"
+                    onclick="activateAnnual('${u.id}',1)">Solo 42€/an</button>
+                  <button class="action-btn" style="background:rgba(56,168,232,.12);color:#38A8E8;border:1px solid rgba(56,168,232,.3);font-weight:800"
+                    onclick="activateAnnual('${u.id}',3)">Multi 53€/an</button>
+                  <button class="action-btn" style="background:rgba(123,95,232,.15);color:#b59aff;border:1px solid rgba(123,95,232,.45);font-weight:800"
+                    onclick="setUnlimited('${u.id}')">∞ Illimité</button>
+                  <button class="action-btn action-btn--green"  onclick="activateUser('${u.id}',30)">+30 jours</button>
+                  <button class="action-btn action-btn--gold"   onclick="setTest('${u.id}')">Test 7j</button>
+                  <button class="action-btn action-btn--red"    onclick="deactivate('${u.id}')">Bloquer</button>
+                  <button class="action-btn" style="background:rgba(232,51,74,.25);color:#ff8899;border:1px solid rgba(232,51,74,.5);font-weight:800"
+                    onclick="deleteUser('${u.id}', ${JSON.stringify(u.email||"").replace(/"/g, '&quot;')})">🗑 Supprimer</button>
+                </div>`
+            }
+          </div>`;
+      }).join("");
+    }
+
+
+    function filterUsers(){
+      const q = document.getElementById("userSearch").value.toLowerCase();
+      document.querySelectorAll("#userCardList .user-card[data-email]").forEach(card => {
+        card.style.display = card.dataset.email.includes(q) ? "" : "none";
+      });
+    }
+
+    async function createAccount(){
+      const btn    = document.querySelector("[onclick='createAccount()']");
+      const email  = document.getElementById("newEmail").value.trim();
+      const pw     = document.getElementById("newPw").value;
+      const plan   = document.getElementById("newPlan").value;
+      const expiry = document.getElementById("newExpiry").value;
+      const msg    = document.getElementById("createMsg");
+
+      if(!email || !pw){ showMsg(msg,"error","E-mail et mot de passe requis."); return; }
+      btn.disabled = true; btn.textContent = "Création…";
+
+      try {
+        // Utilise signUp (pas auth.admin qui nécessite service_role non sûr côté client)
+        const { data, error } = await A.supabase.auth.signUp({
+          email, password: pw,
+          options: { emailRedirectTo: "https://morpheus45.github.io/VOD/login.html" }
+        });
+        if(error){
+          if(/database error/i.test(error.message||"")){
+            throw new Error(
+              "DATABASE ERROR — Le trigger Supabase est cassé.\n\n" +
+              "→ Ouvrez app.supabase.com → SQL Editor → collez et exécutez :\n\n" +
+              "create or replace function handle_new_user()\n" +
+              "returns trigger language plpgsql security definer\n" +
+              "set search_path = public as $$\n" +
+              "begin\n" +
+              "  insert into public.profiles(id,email,plan)\n" +
+              "  values(new.id,new.email,\n" +
+              "    case when new.email='cedric.lago@gmail.com' then 'admin' else 'pending' end)\n" +
+              "  on conflict(id) do nothing;\n" +
+              "  return new;\n" +
+              "exception when others then return new;\n" +
+              "end; $$;\n\n" +
+              "drop trigger if exists on_auth_user_created on auth.users;\n" +
+              "create trigger on_auth_user_created after insert on auth.users\n" +
+              "for each row execute procedure handle_new_user();"
+            );
+          }
+          throw error;
+        }
+        if(!data.user) throw new Error("Utilisateur non créé — vérifiez si l'email est déjà utilisé.");
+
+        const expAt = (plan==="solo"||plan==="multi")
+          ? new Date(Date.now()+365*24*3600*1000).toISOString()
+          : plan==="test"
+          ? new Date(Date.now()+7*24*3600*1000).toISOString()
+          : (expiry ? new Date(expiry).toISOString() : null);
+
+        const dbPlan   = (plan==="solo"||plan==="multi"||plan==="test") ? "active" : plan;
+        const devAllow = plan==="admin"||plan==="unlimited" ? 999 : plan==="multi" ? 3 : 1;
+
+        await A.supabase.from("profiles").upsert({
+          id: data.user.id, email,
+          plan: dbPlan,
+          subscription_expires_at: expAt,
+          devices_allowed: devAllow
+        });
+
+        showMsg(msg,"success","✓ Compte créé : " + email + " — un e-mail de confirmation lui a été envoyé.");
+        loadAdmin();
+      } catch(err){
+        showMsg(msg,"error", err.message);
+      } finally {
+        btn.disabled = false; btn.textContent = "Créer";
+      }
+    }
+
+    // ── Activation plan annuel Solo (1 appareil) ou Multi (3 appareils) ──
+    async function activateAnnual(userId, devices){
+      const label = devices === 3 ? "Multi 53 €/an (3 appareils)" : "Solo 42 €/an (1 appareil)";
+      const amount = devices === 3 ? 53 : 42;
+      if(!confirm(`Activer ${label} pour cet utilisateur ?\nAccès valable 365 jours.`)) return;
+      try {
+        const expAt = new Date(Date.now() + 365*24*3600*1000).toISOString();
+        const { error } = await A.supabase.from("profiles")
+          .update({ plan:"active", subscription_expires_at: expAt, devices_allowed: devices }).eq("id", userId);
+        if(error) throw error;
+        try {
+          await A.supabase.from("payments").insert({
+            user_id: userId, amount, type:"subscription",
+            period_start: new Date().toISOString().slice(0,10),
+            period_end: expAt.slice(0,10),
+            confirmed_at: new Date().toISOString(), confirmed_by: _session?.user?.id,
+            notes: label
+          });
+        } catch{}
+        showGlobalMsg(`✓ ${label} activé — 365 jours`);
+        loadAdmin();
+      } catch(err){ alert("Erreur activation : " + (err.message||err)); }
+    }
+
+    async function activateUser(userId, days){
+      try {
+        const expAt = new Date(Date.now() + days*24*3600*1000).toISOString();
+        const { error } = await A.supabase.from("profiles")
+          .update({ plan:"active", subscription_expires_at: expAt }).eq("id", userId);
+        if(error) throw error;
+        // Enregistrer le paiement (fire-and-forget, ne bloque pas l'activation)
+        try {
+          await A.supabase.from("payments").insert({
+            user_id: userId, amount: 4.99, type:"subscription",
+            period_start: new Date().toISOString().slice(0,10),
+            period_end: expAt.slice(0,10),
+            confirmed_at: new Date().toISOString(), confirmed_by: _session?.user?.id
+          });
+        } catch{}
+        showGlobalMsg("✓ Activé pour " + days + " jours");
+        loadAdmin();
+      } catch(err){ alert("Erreur activation : " + (err.message||err)); }
+    }
+
+    async function setUnlimited(userId){
+      try {
+        const { error } = await A.supabase.from("profiles")
+          .update({ plan:"unlimited", subscription_expires_at: null, devices_allowed: 999 }).eq("id", userId);
+        if(error) throw error;
+        showGlobalMsg("✓ Compte illimité");
+        loadAdmin();
+      } catch(err){ alert("Erreur illimité : " + (err.message||err)); }
+    }
+
+    async function setTest(userId){
+      try {
+        const expAt = new Date(Date.now()+7*24*3600*1000).toISOString();
+        const { error } = await A.supabase.from("profiles")
+          .update({ plan:"active", subscription_expires_at: expAt }).eq("id", userId);
+        if(error) throw error;
+        showGlobalMsg("✓ Accès test 7 jours");
+        loadAdmin();
+      } catch(err){ alert("Erreur test : " + (err.message||err)); }
+    }
+
+    async function deactivate(userId){
+      if(!confirm("Bloquer cet utilisateur ?")) return;
+      try {
+        const { error } = await A.supabase.from("profiles")
+          .update({ plan:"pending", subscription_expires_at: null }).eq("id", userId);
+        if(error) throw error;
+        showGlobalMsg("✓ Utilisateur bloqué");
+        loadAdmin();
+      } catch(err){ alert("Erreur blocage : " + (err.message||err)); }
+    }
+
+    // ── Suppression complète d'un compte ──
+    async function deleteUser(userId, email){
+      if(!confirm(`⚠ Supprimer DÉFINITIVEMENT le compte de ${email} ?\n\nCette action :\n• Supprime le profil et l'historique de paiements\n• Déconnecte tous les appareils\n• Est IRRÉVERSIBLE\n\nConfirmer ?`)) return;
+      if(!confirm(`Dernière confirmation : supprimer ${email} ?`)) return;
+      try {
+        // Cascade : supprimer profile → cascade kill devices/sessions/payments grâce aux FK
+        // (on supprime aussi explicitement par sécurité au cas où les FK ne sont pas configurées)
+        await A.supabase.from("sessions").delete().eq("user_id", userId);
+        await A.supabase.from("devices").delete().eq("user_id", userId);
+        await A.supabase.from("payments").delete().eq("user_id", userId);
+        const { error } = await A.supabase.from("profiles").delete().eq("id", userId);
+        if(error) throw error;
+        showGlobalMsg("✓ Compte supprimé : " + email);
+        loadAdmin();
+      } catch(err){
+        alert("Erreur : " + err.message);
+      }
+    }
+
+    // ── Confirmation paiement Wero : marque payé + active le compte 30j ──
+    async function confirmPayment(paymentId, userId, amount){
+      if(!confirm(`Confirmer la réception de ${amount.toFixed(2).replace(".",",")} € via Wero ?\n\nLe compte sera activé pour 30 jours.`)) return;
+      try {
+        const expAt = new Date(Date.now() + 30*24*3600*1000).toISOString();
+        // 1. Marquer le paiement comme confirmé
+        await A.supabase.from("payments").update({
+          confirmed_at: new Date().toISOString(),
+          confirmed_by: _session.user.id,
+          period_start: new Date().toISOString().slice(0,10),
+          period_end:   expAt.slice(0,10)
+        }).eq("id", paymentId);
+        // 2. Activer le profil utilisateur
+        await A.supabase.from("profiles").update({
+          plan: "active",
+          subscription_expires_at: expAt
+        }).eq("id", userId);
+        showGlobalMsg("✓ Paiement confirmé · compte activé 30 jours");
+        loadAdmin();
+      } catch(err){
+        alert("Erreur : " + err.message);
+      }
+    }
+
+    // ── Rejet paiement (utilisateur n'a pas vraiment payé) ──
+    async function rejectPayment(paymentId){
+      if(!confirm("Rejeter ce paiement ? L'utilisateur pourra à nouveau cliquer 'J'ai payé'.")) return;
+      try {
+        const { error } = await A.supabase.from("payments").delete().eq("id", paymentId);
+        if(error) throw error;
+        showGlobalMsg("✓ Paiement rejeté");
+        loadAdmin();
+      } catch(err){
+        alert("Erreur : " + err.message);
+      }
+    }
+
+    function showMsg(el, type, text){
+      el.className = `msg msg--${type}`;
+      el.textContent = text;
+      el.style.display = "block";
+      setTimeout(()=>{ el.style.display="none"; }, 5000);
+    }
+
+    function showGlobalMsg(text){
+      const t = document.createElement("div");
+      t.textContent = text;
+      t.style.cssText="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:12px;background:rgba(100,220,140,.15);border:1px solid rgba(100,220,140,.3);color:#6ef7b0;font-size:13px;font-weight:700;z-index:999;white-space:nowrap";
+      document.body.appendChild(t);
+      setTimeout(()=>t.remove(), 3000);
+    }
+
+    // Pré-chargement (géré dans loadAdmin via Promise.all)
+
+    init();
+  </script>
+</body>
+</html>

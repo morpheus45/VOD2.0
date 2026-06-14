@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr" style="background:#000">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Lecteur PIPSILY</title>
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" />
+  <link rel="icon" href="icons/icon-192.png" type="image/png" />
+  <!-- Fond noir IMMÉDIAT avant chargement CSS — évite le flash blanc -->
+  <style>html,body{background:#000 !important;margin:0;padding:0}</style>
+  <link rel="stylesheet" href="player.css" />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest" async onerror="console.warn('HLS.js CDN indisponible')"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mpegts.js@latest" async onerror="console.warn('MPEG-TS.js CDN indisponible')"></script>
+</head>
+<body style="background:#000">
+  <div class="player-shell">
+
+    <!-- Barre supérieure -->
+    <div class="player-top">
+      <button id="backBtn" class="icon-btn" type="button">← Retour</button>
+      <div class="player-title-wrap">
+        <div id="playerTitle" class="player-title">Lecture</div>
+        <div id="playerSub"   class="player-meta"></div>
+      </div>
+      <button id="favBtn" class="icon-btn" type="button">♥</button>
+    </div>
+
+    <!-- Vidéo -->
+    <div class="video-wrap">
+      <video id="video" playsinline autoplay preload="metadata"></video>
+      <div id="overlay" class="overlay">
+        <button id="playOverlayBtn" class="play-overlay" type="button">▶</button>
+      </div>
+      <div id="playbackStatus" class="playback-status" hidden></div>
+    </div>
+
+    <!-- Navigation épisodes (séries) -->
+    <div class="ep-nav" id="epNav">
+      <button id="prevEpBtn" class="ep-nav-btn" type="button" disabled>⏮ Épisode précédent</button>
+      <button id="nextEpBtn" class="ep-nav-btn ep-nav-btn--next" type="button" disabled>Épisode suivant ⏭</button>
+    </div>
+
+    <!-- Actions -->
+    <div class="player-actions">
+      <button id="nativeBtn"     type="button" class="btn-primary">▶ Lecture native</button>
+      <button id="fullscreenBtn" type="button">⛶ Plein écran</button>
+      <button id="copyBtn"       type="button">⎘ Copier le lien</button>
+      <button id="externalBtn"   type="button">↗ Lien direct</button>
+      <button id="vlcBtn"        type="button">VLC</button>
+    </div>
+
+    <!-- Infos -->
+    <div class="player-panel">
+      <h2>Synopsis</h2>
+      <p id="plotText">Aucune description.</p>
+    </div>
+
+  </div>
+
+  <script src="player.js?v=51"></script>
+</body>
+</html>

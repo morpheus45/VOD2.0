@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Thème phone/tablet : fond sombre, plein écran -->
+    <style name="Theme.Pipsiflix" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">#060b16</item>
+        <item name="android:statusBarColor">#060b16</item>
+        <item name="android:navigationBarColor">#060b16</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <!-- Thème Android TV — on hérite simplement de NoActionBar
+         (le vrai Leanback theme nécessite des deps + ressources que
+         nous n'utilisons pas — TvActivity est juste une WebView). -->
+    <style name="Theme.Pipsiflix.TV" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">#060b16</item>
+        <item name="android:statusBarColor">#060b16</item>
+        <item name="android:navigationBarColor">#060b16</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+</resources>

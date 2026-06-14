@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PIPSILY - Connexion</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 20% 0%,rgba(123,95,232,.18),transparent 50%),radial-gradient(ellipse at 80% 0%,rgba(56,168,232,.14),transparent 50%),#05080f;font-family:Outfit,Segoe UI,system-ui,sans-serif;color:#eef4ff;padding:20px}
+    .card{width:100%;max-width:440px;background:rgba(12,20,34,.9);border:1px solid rgba(255,255,255,.09);border-radius:24px;padding:36px 32px;backdrop-filter:blur(20px)}
+    .logo{text-align:center;margin-bottom:28px}
+    .logo-sub{font-size:12px;color:#7a9cc0;margin-top:4px}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:24px;background:rgba(255,255,255,.05);border-radius:12px;padding:4px}
+    .tab{padding:10px;border-radius:9px;border:none;cursor:pointer;font-size:14px;font-weight:600;background:transparent;color:#7a9cc0;transition:all .2s}
+    .tab.active{background:linear-gradient(135deg,#7B5FE8,#38A8E8);color:#fff}
+    .form-group{margin-bottom:16px}
+    label{display:block;font-size:12px;font-weight:600;color:#7a9cc0;margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase}
+    input[type=email],input[type=password]{width:100%;padding:13px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#eef4ff;font-size:15px;outline:none;transition:border-color .2s,box-shadow .2s}
+    input:focus{border-color:#7B5FE8;box-shadow:0 0 0 3px rgba(123,95,232,.2)}
+    .btn-primary{width:100%;padding:14px;border-radius:13px;border:none;cursor:pointer;background:linear-gradient(135deg,#7B5FE8,#38A8E8);color:#fff;font-size:15px;font-weight:700;margin-top:4px;box-shadow:0 6px 24px rgba(123,95,232,.3);transition:opacity .15s,transform .12s}
+    .btn-primary:hover{opacity:.9}.btn-primary:active{transform:scale(.97)}.btn-primary:disabled{opacity:.5;cursor:default}
+    .msg{margin-top:14px;padding:12px 16px;border-radius:11px;font-size:13px;line-height:1.5;text-align:center;display:none}
+    .msg--error{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.3);color:#ff8899}
+    .msg--success{background:rgba(100,220,140,.1);border:1px solid rgba(100,220,140,.3);color:#7ef7b0}
+    .msg--info{background:rgba(56,168,232,.1);border:1px solid rgba(56,168,232,.3);color:#82b4ff}
+    .forgot{display:block;text-align:center;color:#7a9cc0;font-size:12px;text-decoration:none;margin-top:14px}
+    .forgot:hover{color:#eef4ff}
+    .password-wrap{position:relative}
+    .toggle-pw{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:#7a9cc0;cursor:pointer;font-size:16px}
+    .plan-label{font-size:12px;font-weight:600;color:#7a9cc0;letter-spacing:.03em;text-transform:uppercase;margin-bottom:10px}
+    .plans-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+    .plan-option{position:relative}
+    .plan-option input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+    .plan-box{display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 10px;border-radius:14px;cursor:pointer;border:2px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);transition:border-color .2s,background .2s;text-align:center}
+    .plan-option input:checked + .plan-box{border-color:#7B5FE8;background:rgba(123,95,232,.12)}
+    .plan-box:hover{border-color:rgba(123,95,232,.5)}
+    .plan-name{font-size:15px;font-weight:800;color:#eef4ff}
+    .plan-price{font-size:22px;font-weight:900;color:#7B5FE8;line-height:1.1}
+    .plan-price span{font-size:13px;font-weight:500;color:#a0bccc}
+    .plan-equiv{font-size:10px;color:#7a9cc0}
+    .plan-badge{font-size:9px;font-weight:700;background:linear-gradient(135deg,#7B5FE8,#38A8E8);color:#fff;border-radius:20px;padding:2px 8px;margin-bottom:2px}
+    .plan-feat{font-size:11px;color:#a0bccc;margin-top:4px}
+    .paypal-block{display:none;margin-top:20px;padding:20px;border-radius:14px;border:1px solid rgba(100,220,140,.3);background:rgba(100,220,140,.06);text-align:center}
+    .paypal-block.show{display:block}
+    .paypal-block p{font-size:14px;color:#7ef7b0;margin-bottom:14px;line-height:1.6}
+    .btn-paypal{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:12px;background:linear-gradient(135deg,#009cde,#003087);color:#fff;font-size:15px;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(0,60,150,.4);transition:opacity .15s}
+    .btn-paypal:hover{opacity:.9}
+    .note-activation{font-size:11px;color:#7a9cc0;margin-top:12px;line-height:1.6}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <img src="./logo.svg" alt="PIPSILY" style="height:44px;width:auto;display:block;margin:0 auto 6px;filter:drop-shadow(0 0 12px rgba(123,111,232,.4))" />
+      <div class="logo-sub">Votre cinema a la maison</div>
+    </div>
+    <div class="tabs" id="tabsBar">
+      <button class="tab active" id="tabLogin" onclick="switchTab('login')">Se connecter</button>
+      <button class="tab" id="tabSignup" onclick="switchTab('signup')">Creer un compte</button>
+    </div>
+    <form id="authForm" autocomplete="on" action="javascript:void(0)">
+      <div class="form-group">
+        <label for="emailInput">Adresse e-mail</label>
+        <input type="email" id="emailInput" placeholder="votre@email.com" autocomplete="email" required />
+      </div>
+      <div class="form-group">
+        <label for="pwInput">Mot de passe</label>
+        <div class="password-wrap">
+          <input type="password" id="pwInput" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="current-password" required minlength="8" />
+          <button type="button" class="toggle-pw" onclick="togglePw()">&#128065;</button>
+        </div>
+      </div>
+      <div id="signupExtra" style="display:none">
+        <div class="form-group">
+          <label for="pwConfirm">Confirmer le mot de passe</label>
+          <div class="password-wrap">
+            <input type="password" id="pwConfirm" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="new-password" minlength="8" />
+          </div>
+        </div>
+        <div class="plan-label">Choisir votre abonnement</div>
+        <div class="plans-grid">
+          <label class="plan-option">
+            <input type="radio" name="plan" value="solo" checked />
+            <div class="plan-box">
+              <div class="plan-name">Solo</div>
+              <div class="plan-price">42<span> / an</span></div>
+              <div class="plan-equiv">soit 3,50 par mois</div>
+              <div class="plan-feat">1 ecran - 1 appareil</div>
+            </div>
+          </label>
+          <label class="plan-option">
+            <input type="radio" name="plan" value="multi" />
+            <div class="plan-box">
+              <div class="plan-badge">Populaire</div>
+              <div class="plan-name">Multi</div>
+              <div class="plan-price">53<span> / an</span></div>
+              <div class="plan-equiv">soit 4,42 par mois</div>
+              <div class="plan-feat">3 ecrans - 3 appareils</div>
+            </div>
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary" id="submitBtn">Se connecter</button>
+    </form>
+    <div class="paypal-block" id="paypalBlock">
+      <p>Compte cree !<br>Finalisez votre abonnement en payant ci-dessous :</p>
+      <a href="#" id="paypalLink" class="btn-paypal" target="_blank" rel="noopener">Payer via PayPal</a>
+      <div class="note-activation">Paiement unique annuel - aucun prelevement automatique.<br>Votre acces sera active sous quelques heures apres verification du paiement.</div>
+    </div>
+    <div class="msg" id="authMsg"></div>
+    <a href="#" class="forgot" id="forgotLink" onclick="forgotPw(event)">Mot de passe oublie ?</a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="./auth.js"></script>
+  <script>
+(async()=>{
+  if(!/Android/i.test(navigator.userAgent)||typeof window.AndroidBridge!='undefined')return;
+  const d=Number(localStorage.getItem('pf_apk_install_dismiss')||0);if(Date.now()<d)return;
+  const v=await fetch('./version.json').then(r=>r.ok?r.json():null).catch(()=>null);
+  const u=/^https:\/\/github\.com\//.test(v?.apk_url||'')?v.apk_url:'https://github.com/morpheus45/VOD/releases/latest';
+  const b=document.createElement('div');
+  b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9998;display:flex;align-items:center;gap:12px;padding:12px 16px;background:linear-gradient(135deg,#1a1060,#0e0a30);border-bottom:2px solid rgba(107,63,224,.6);color:#fff;box-shadow:0 4px 20px rgba(0,0,0,.6)';
+  b.innerHTML='<img src='+String.fromCharCode(39)+'./logo.svg'+String.fromCharCode(39)+' style='+String.fromCharCode(39)+'height:30px;flex-shrink:0'+String.fromCharCode(39)+'><div style='+String.fromCharCode(39)+'flex:1'+String.fromCharCode(39)+'><div style='+String.fromCharCode(39)+'font-size:13px;font-weight:800'+String.fromCharCode(39)+'>Installer l'+String.fromCharCode(39)+'app</div></div><a href='+String.fromCharCode(39)+u+String.fromCharCode(39)+' target='+String.fromCharCode(39)+'_blank'+String.fromCharCode(39)+' style='+String.fromCharCode(39)+'padding:9px 16px;border-radius:10px;background:linear-gradient(135deg,#6B3FE0,#38A8E8);color:#fff;font-size:13px;font-weight:700;text-decoration:none'+String.fromCharCode(39)+'>Installer</a><button id='+String.fromCharCode(39)+'xb'+String.fromCharCode(39)+' style='+String.fromCharCode(39)+'background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:8px;padding:8px 10px;cursor:pointer'+String.fromCharCode(39)+'>X</button>';
+  document.body.prepend(b);document.body.style.paddingTop=(b.offsetHeight||60)+'px';
+  document.getElementById('xb').onclick=()=>{b.remove();document.body.style.paddingTop='';localStorage.setItem('pf_apk_install_dismiss',String(Date.now()+604800000))};
+})();
+const PP={solo:'https://paypal.me/pipsily/42',multi:'https://paypal.me/pipsily/53'};
+const PL={solo:'42 EUR Solo (1 ecran)',multi:'53 EUR Multi (3 ecrans)'};
+const _A=window.PIPSILY_AUTH||null;let mode='login';
+if(_A&&_A.getSession){_A.getSession().then(s=>{if(s)location.href='./index.html'}).catch(()=>{})}
+const sp=()=>(document.querySelector('input[name="plan"]:checked')||{}).value||'solo';
+function switchTab(m){
+  mode=m;
+  document.getElementById('tabLogin').classList.toggle('active',m==='login');
+  document.getElementById('tabSignup').classList.toggle('active',m==='signup');
+  document.getElementById('signupExtra').style.display=m==='signup'?'block':'none';
+  document.getElementById('submitBtn').textContent=m==='login'?'Se connecter':'Creer mon compte';
+  document.getElementById('pwInput').autocomplete=m==='login'?'current-password':'new-password';
+  document.getElementById('forgotLink').style.display=m==='login'?'block':'none';
+  document.getElementById('paypalBlock').classList.remove('show');
+  document.getElementById('authForm').style.display='block';
+  document.getElementById('tabsBar').style.display='';
+  const pc=document.getElementById('pwConfirm');if(pc)pc.required=m==='signup';clearMsg();
+}
+function showMsg(t,tx,h){const el=document.getElementById('authMsg');el.className='msg msg--'+t;h?el.innerHTML=tx:el.textContent=tx;el.style.display='block'}
+function clearMsg(){const el=document.getElementById('authMsg');if(el)el.style.display='none'}
+function togglePw(){const i=document.getElementById('pwInput');i.type=i.type==='password'?'text':'password'}
+async function forgotPw(e){
+  e.preventDefault();
+  if(!_A||!_A.supabase){showMsg('info','Contactez l administrateur.');return}
+  const em=document.getElementById('emailInput').value.trim();
+  if(!em){showMsg('error','Entrez votre e-mail.');return}
+  try{const{error}=await _A.supabase.auth.resetPasswordForEmail(em,{redirectTo:'https://morpheus45.github.io/VOD/login.html'});
+  error?showMsg('error',error.message):showMsg('success','Lien envoye a '+em)}catch(err){showMsg('error',err.message)}
+}
+document.getElementById('authForm').addEventListener('submit',async e=>{
+  e.preventDefault();clearMsg();
+  if(!_A){showMsg('error','Service non charge. Rechargez la page.');return}
+  const btn=document.getElementById('submitBtn');
+  const em=document.getElementById('emailInput').value.trim().toLowerCase();
+  const pw=document.getElementById('pwInput').value;
+  if(!em||!pw){showMsg('error','Remplissez tous les champs.');return}
+  btn.disabled=true;btn.textContent=mode==='login'?'Connexion...':'Creation...';
+  try{
+    if(mode==='signup'){
+      const pw2=(document.getElementById('pwConfirm')||{}).value||'';
+      if(pw!==pw2){showMsg('error','Mots de passe differents.');return}
+      if(pw.length<8){showMsg('error','8 caracteres minimum.');return}
+      const{data:sData,error:sErr}=await _A.signUp(em,pw);
+      if(sErr){
+        const m=sErr.message||'';
+        if(/database error/i.test(m))
+          showMsg('error','Erreur serveur lors de la creation. Reessayez dans quelques secondes ou contactez l\'administrateur.');
+        else if(/already registered|user already/i.test(m)){
+          showMsg('info','Cet e-mail est deja utilise. Connectez-vous.');
+          switchTab('login');
+        }else showMsg('error',m||'Erreur inconnue.');
+        return;
+      }
+      // Supabase exige une confirmation email → session est null
+      if(!sData?.session){
+        showMsg('success','Compte cree ! Verifiez votre boite mail pour confirmer votre adresse, puis revenez vous connecter.');
+        return;
+      }
+      const plan=sp();const lnk=document.getElementById('paypalLink');
+      lnk.href=PP[plan];lnk.textContent='Payer '+PL[plan]+' via PayPal';
+      document.getElementById('paypalBlock').classList.add('show');
+      document.getElementById('authForm').style.display='none';
+      document.getElementById('tabsBar').style.display='none';
+    }else{
+      const{error,data}=await _A.signIn(em,pw);
+      if(error){
+        // Afficher l erreur Supabase exacte — plus claire que le message generique
+        const msg=error.message||'';
+        if(/not confirmed/i.test(msg)||/email.*confirm/i.test(msg))
+          showMsg('info','Confirmez d abord votre adresse e-mail (verifiez vos spams).');
+        else if(/invalid.*credentials|invalid login/i.test(msg))
+          showMsg('error','E-mail ou mot de passe incorrect.');
+        else
+          showMsg('error',msg||'Connexion impossible. Reessayez.');
+        return;
+      }
+      await _A.registerSession(data.session.user.id).catch(()=>{});
+      location.href='./index.html';
+    }
+  }catch(err){showMsg('error','Erreur : '+(err.message||err))}
+  finally{btn.disabled=false;btn.textContent=mode==='login'?'Se connecter':'Creer mon compte'}
+});
+  </script>
+</body>
+</html>

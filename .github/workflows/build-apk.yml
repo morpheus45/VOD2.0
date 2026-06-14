@@ -1,0 +1,154 @@
+name: 📦 Build & Release APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android-app/**'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+    inputs:
+      bump_version:
+        description: 'Incrémenter versionCode automatiquement ?'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  build:
+    name: Compiler et publier PIPSILY.apk
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # ─── 1. Checkout ────────────────────────────────────────────────
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      # ─── 2. Java 17 ─────────────────────────────────────────────────
+      - name: ☕ Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      # ─── 3. Permissions Gradle ──────────────────────────────────────
+      - name: 🔧 Chmod gradlew
+        run: chmod +x android-app/gradlew
+
+      # ─── 4. Lire la version actuelle ────────────────────────────────
+      - name: 📖 Lire versionCode depuis build.gradle
+        id: ver
+        run: |
+          CODE=$(grep 'versionCode' android-app/app/build.gradle | grep -oP '\d+')
+          NAME=$(grep 'versionName' android-app/app/build.gradle | grep -oP '"[^"]+"' | tr -d '"')
+          echo "code=$CODE" >> $GITHUB_OUTPUT
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "tag=v$CODE"  >> $GITHUB_OUTPUT
+          echo "➜ versionCode=$CODE  versionName=$NAME"
+
+      # ─── 5. Keystore (secret Base64) ────────────────────────────────
+      # Si le secret KEYSTORE_BASE64 est défini → APK release signé
+      # Sinon → APK debug (pour test uniquement, non installable par-dessus un release)
+      - name: 🔑 Décoder le keystore
+        id: ks
+        run: |
+          if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+            # Chemin absolu /tmp → pas de confusion avec le répertoire Gradle
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > /tmp/release.jks
+            echo "ks_path=/tmp/release.jks" >> $GITHUB_OUTPUT
+            echo "signed=true"              >> $GITHUB_OUTPUT
+            echo "✅ Keystore release → APK signé"
+          else
+            echo "signed=false" >> $GITHUB_OUTPUT
+            echo "⚠️  Pas de KEYSTORE_BASE64 → APK debug"
+          fi
+
+      # ─── 6. Build APK ───────────────────────────────────────────────
+      - name: 🔨 Build APK
+        working-directory: android-app
+        run: |
+          if [ "${{ steps.ks.outputs.signed }}" = "true" ]; then
+            ./gradlew assembleRelease \
+              -Pandroid.injected.signing.store.file="${{ steps.ks.outputs.ks_path }}" \
+              -Pandroid.injected.signing.store.password="${{ secrets.KEYSTORE_PASSWORD }}" \
+              -Pandroid.injected.signing.key.alias="${{ secrets.KEY_ALIAS }}" \
+              -Pandroid.injected.signing.key.password="${{ secrets.KEY_PASSWORD }}"
+            cp app/build/outputs/apk/release/app-release.apk PIPSILY.apk
+            echo "✅ APK release signé : PIPSILY.apk"
+          else
+            ./gradlew assembleDebug
+            cp app/build/outputs/apk/debug/app-debug.apk PIPSILY.apk
+            echo "✅ APK debug : PIPSILY.apk"
+          fi
+
+      # ─── 7. Forcer le tag local (évite les conflits de tag existant) ──
+      - name: 🏷️ Tagger le commit
+        run: |
+          TAG="v${{ steps.ver.outputs.code }}"
+          git tag -f $TAG
+          git push origin $TAG --force
+        continue-on-error: true
+
+      # ─── 8. Créer ou mettre à jour la Release GitHub ────────────────
+      - name: 🚀 Publier la Release GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.code }}
+          name: "PIPSILY v${{ steps.ver.outputs.name }}"
+          draft: false
+          prerelease: false
+          body: |
+            ## PIPSILY v${{ steps.ver.outputs.name }}
+
+            APK généré automatiquement depuis le code source.
+
+            ### Installation
+            1. Téléchargez `PIPSILY.apk`
+            2. Activez **Sources inconnues** dans Paramètres Android
+            3. Ouvrez le fichier pour installer
+            4. L'application se mettra à jour automatiquement par la suite
+
+            > Build ${{ github.sha }} · ${{ github.event_name }}
+          files: android-app/PIPSILY.apk
+          make_latest: true
+          overwrite_files: true
+
+      # ─── 9. Mettre à jour version.json ──────────────────────────────
+      - name: 📝 Mettre à jour version.json
+        run: |
+          VER="${{ steps.ver.outputs.code }}"
+          CHANGES=$(grep '"changes"' version.json | sed 's/.*"changes": *"\(.*\)".*/\1/')
+          python3 - <<'PYEOF'
+          import json, os
+          ver = os.environ['VER']
+          with open('version.json', 'r', encoding='utf-8') as f:
+              d = json.load(f)
+          d['apk_version'] = int(ver)
+          d['apk_url'] = f'https://github.com/morpheus45/VOD/releases/download/v{ver}/PIPSILY.apk'
+          with open('version.json', 'w', encoding='utf-8') as f:
+              json.dump(d, f, indent=2, ensure_ascii=False)
+              f.write('\n')
+          print(f"version.json → apk_version={ver}")
+          PYEOF
+        env:
+          VER: ${{ steps.ver.outputs.code }}
+
+      # ─── 10. Commit + push version.json ─────────────────────────────
+      - name: 📤 Commit version.json
+        run: |
+          git config user.name  "PIPSILY Bot"
+          git config user.email "bot@pipsily.local"
+          git add version.json
+          if git diff --staged --quiet; then
+            echo "version.json déjà à jour — rien à commiter"
+          else
+            git commit -m "chore: APK v${{ steps.ver.outputs.code }} publié [skip ci]"
+            git push
+            echo "✅ version.json mis à jour"
+          fi

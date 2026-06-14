@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<tproject>
+
+  <!-- ─── Project metadata ─────────────────────────────────────────── -->
+  <project>
+    <id>com.morpheus45.pipsily</id>
+    <name>PIPSILY TV</name>
+    <type>org.tizen.web.project</type>
+    <profile>tv-samsung-public-7.0</profile>
+    <platform>tizen</platform>
+  </project>
+
+  <!-- ─── Build configuration ──────────────────────────────────────── -->
+  <build>
+    <outputDir>result</outputDir>
+    <signatureProfile>default</signatureProfile>
+    <!-- Exclure les fichiers de développement du paquet .wgt -->
+    <excludeList>
+      <pattern>*.md</pattern>
+      <pattern>*.ps1</pattern>
+      <pattern>*.bat</pattern>
+      <pattern>*.sh</pattern>
+      <pattern>.git/**</pattern>
+      <pattern>node_modules/**</pattern>
+      <pattern>result/**</pattern>
+      <pattern>.tproject</pattern>
+      <pattern>.project</pattern>
+    </excludeList>
+  </build>
+
+  <!-- ─── Run configuration ────────────────────────────────────────── -->
+  <run>
+    <appId>com.morpheus45.pipsily</appId>
+    <type>web</type>
+  </run>
+
+</tproject>

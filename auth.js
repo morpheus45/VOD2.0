@@ -87,7 +87,7 @@ async function signUp(email, password){
   if(!_configured || !_supa){
     return { error: { message: "⚙️ Configuration en cours. Lancez SETUP.bat pour activer les inscriptions." } };
   }
-  const redirectTo = "https://morpheus45.github.io/VOD/login.html";
+  const redirectTo = new URL("login.html", location.href).href;
   return _supa.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } });
 }
 
@@ -393,11 +393,35 @@ function promptParentalPin(storedPin){
 //  encore créées (erreurs DB catchées, jamais de crash silencieux).
 // ─────────────────────────────────────────────────────────────────
 
+// Coupe-boucle : empêche un aller-retour infini login ↔ index/cosmos
+// (ex : dépendance auth manquante sur une page). Au-delà de 4 rebonds,
+// on stoppe et on affiche un message au lieu de reboucler.
+function _gotoLogin(){
+  try{
+    const n = (parseInt(sessionStorage.getItem("pf_auth_bounce") || "0", 10) || 0) + 1;
+    sessionStorage.setItem("pf_auth_bounce", String(n));
+    if(n > 4){
+      document.body.innerHTML =
+        '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;'+
+        'text-align:center;font-family:sans-serif;color:#fff;background:#04060d;padding:24px">'+
+        '<div><h2>Connexion impossible</h2>'+
+        '<p style="color:#9ab;max-width:440px;margin:12px auto;line-height:1.6">La session ne se '+
+        'charge pas correctement sur cette page. Vérifiez votre connexion internet, puis reconnectez-vous.</p>'+
+        '<button onclick="try{sessionStorage.removeItem(\'pf_auth_bounce\')}catch(e){};location.href=\'./login.html\'" '+
+        'style="margin-top:16px;padding:12px 28px;border:none;border-radius:999px;'+
+        'background:linear-gradient(135deg,#7B5FE8,#38A8E8);color:#fff;font-weight:700;cursor:pointer">'+
+        'Se reconnecter</button></div></div>';
+      return;
+    }
+  }catch(e){}
+  window.location.href = "./login.html";
+}
+
 async function authGate(){
   // ── Supabase non configuré → rediriger vers login ──
   if(!_configured || !_supa){
     console.warn("[PIPSILY] Supabase non configuré — redirection login");
-    window.location.href = "./login.html";
+    _gotoLogin();
     return null;
   }
 
@@ -407,9 +431,12 @@ async function authGate(){
   catch(e){ console.warn("[PIPSILY] getSession:", e.message); }
 
   if(!session){
-    window.location.href = "./login.html";
+    _gotoLogin();
     return null;
   }
+
+  // Session valide → réinitialiser le compteur de rebonds
+  try{ sessionStorage.removeItem("pf_auth_bounce"); }catch(e){}
 
   // ── Abonnement (erreur table = on laisse passer plutôt que de bloquer) ──
   let sub = { ok: false, plan: null };

@@ -2,9 +2,15 @@
 <html lang="fr">
 <head>
   <script>
-    /* Routage interface : si l'utilisateur a choisi Cosmos TV dans les réglages,
-       on bascule AVANT de charger l'app Xstream (l'auth est gérée par cosmos.html). */
-    try{ if(localStorage.getItem('pf_theme')==='cosmos'){ location.replace('./cosmos.html'); } }catch(e){}
+    /* Routage interface — RÉSERVÉ À LA TV : le choix Cosmos ne s'applique que sur
+       Android TV / Google TV. Sur mobile et navigateur, on reste TOUJOURS sur
+       l'interface PIPSILY Xstream (optimisée tactile). */
+    try{
+      var _isTV = /AndroidTV|GoogleTV|SmartTV/i.test(navigator.userAgent)
+               || /\bTV\b/.test(navigator.userAgent)
+               || window.PIPSILY_NATIVE === 'android_tv';
+      if(_isTV && localStorage.getItem('pf_theme')==='cosmos'){ location.replace('./cosmos.html'); }
+    }catch(e){}
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />

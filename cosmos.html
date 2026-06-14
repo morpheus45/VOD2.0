@@ -2354,8 +2354,13 @@ window._onDownloadProgress=function(pct){
 // Safety: cache le spinner apres 25s dans tous les cas
 setTimeout(()=>{$('loading').hidden=true;},25000);
 
-// Auth identique à VOD : même Supabase, même session partagée (origine commune)
+// Cosmos = interface TV uniquement. Hors TV (mobile/navigateur) → retour Xstream.
 (async function(){
+  var _isTV = /AndroidTV|GoogleTV|SmartTV/i.test(navigator.userAgent)
+           || /\bTV\b/.test(navigator.userAgent)
+           || window.PIPSILY_NATIVE === 'android_tv';
+  if(!_isTV){ location.replace('./index.html'); return; }
+  // Auth identique à VOD : même Supabase, même session partagée (origine commune)
   if(window.PIPSILY_AUTH&&window.PIPSILY_AUTH.authGate){
     try{ const a=await window.PIPSILY_AUTH.authGate(); if(!a) return; }catch(e){}
   }

@@ -347,9 +347,9 @@
           <div class="msg" id="pwMsg"></div>
         </div>
 
-        <!-- Interface -->
-        <div class="card">
-          <div class="card-title">Interface</div>
+        <!-- Interface (TV uniquement) -->
+        <div class="card" id="ifaceCard" style="display:none">
+          <div class="card-title">Interface (TV)</div>
           <label>Choisissez l'apparence de l'application</label>
           <select id="ifaceSelect">
             <option value="xstream">PIPSILY Xstream (par défaut)</option>
@@ -365,10 +365,17 @@
         </div>
       `;
 
-      // Interface : pré-sélection + application
+      // Interface : carte visible UNIQUEMENT sur TV (mobile = toujours Xstream)
       try{
-        const sel = document.getElementById("ifaceSelect");
-        if(sel) sel.value = localStorage.getItem("pf_theme") === "cosmos" ? "cosmos" : "xstream";
+        const _isTV = /AndroidTV|GoogleTV|SmartTV/i.test(navigator.userAgent)
+                   || /\bTV\b/.test(navigator.userAgent)
+                   || window.PIPSILY_NATIVE === "android_tv";
+        const card = document.getElementById("ifaceCard");
+        if(card && _isTV){
+          card.style.display = "";
+          const sel = document.getElementById("ifaceSelect");
+          if(sel) sel.value = localStorage.getItem("pf_theme") === "cosmos" ? "cosmos" : "xstream";
+        }
       }catch(e){}
 
       // Initialiser le PIN parental

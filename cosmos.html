@@ -4,30 +4,28 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="./auth.js"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1920,initial-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <script>
-// Scale universel : adapte le contenu 1920x1080 a TOUTE resolution TV.
-// On se base sur le VIEWPORT DE LAYOUT (clientWidth/Height fixé par le meta
-// width=1920), PAS sur screen.width : sur les TV à densité ×2 (ex Freebox POP,
-// screen.width=960) screen.width réduisait #app de moitié → bande noire à droite.
+// Échelle TV : le layout suit l'écran RÉEL (width=device-width → viewport =
+// taille visible, ex 960×540 sur Freebox POP densité ×2). On met le design
+// fixe 1920×1080 à l'échelle de ce viewport. Toujours appliqué (jamais 1920
+// exact en device-width), origine top-left, body dimensionné au viewport pour
+// éviter tout débordement/scroll horizontal (cause du décalage à la navigation).
 (function(){
-  var de=document.documentElement;
-  var sw=de.clientWidth||window.innerWidth||screen.width||1920;
-  var sh=de.clientHeight||window.innerHeight||screen.height||1080;
-  var scale=Math.min(sw/1920, sh/1080);
-  if(scale<0.99||scale>1.01){
-    var s=document.createElement('style');
-    var sc=scale.toFixed(4);
-    s.textContent=
-      '#app,#bg{transform:scale('+sc+');transform-origin:top left}'+
-      // Corriger la taille du body pour eviter le scroll
-      'html,body{width:'+Math.round(sw)+'px;height:'+Math.round(sh)+'px;overflow:hidden}';
-    document.head.appendChild(s);
+  function fit(){
+    var sw=window.innerWidth||document.documentElement.clientWidth||screen.width||1920;
+    var sh=window.innerHeight||document.documentElement.clientHeight||screen.height||1080;
+    var scale=Math.min(sw/1920, sh/1080);
+    var st=document.getElementById('tvfit')||document.createElement('style');
+    st.id='tvfit';
+    st.textContent=
+      '#app,#bg{transform:scale('+scale.toFixed(4)+');transform-origin:top left}'+
+      'html,body{width:'+Math.round(sw)+'px;height:'+Math.round(sh)+'px;overflow:hidden;margin:0}';
+    if(!st.parentNode) document.head.appendChild(st);
+    window.TV_SCALE=scale; window.TV_W=sw; window.TV_H=sh;
   }
-  // Stocker pour usage JS
-  window.TV_SCALE=scale;
-  window.TV_W=sw;
-  window.TV_H=sh;
+  fit();
+  window.addEventListener('resize',fit);
 })();
 </script>
 <title>Cosmos TV</title>

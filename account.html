@@ -373,6 +373,7 @@
         const card = document.getElementById("ifaceCard");
         if(card && _isTV){
           card.style.display = "";
+          card.parentNode.prepend(card);   // l'afficher EN PREMIER dans les réglages
           const sel = document.getElementById("ifaceSelect");
           if(sel) sel.value = localStorage.getItem("pf_theme") === "cosmos" ? "cosmos" : "xstream";
         }

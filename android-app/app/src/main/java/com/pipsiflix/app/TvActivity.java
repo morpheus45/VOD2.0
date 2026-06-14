@@ -60,7 +60,7 @@ import okhttp3.OkHttpClient;
 public class TvActivity extends FragmentActivity implements TextureView.SurfaceTextureListener {
 
     private static final String TAG         = "PipsilyTV";
-    private static final String APP_URL     = "https://morpheus45.github.io/VOD/";
+    private static final String APP_URL     = "https://morpheus45.github.io/VOD2.0/";
     // Version réelle de l'APK (suivie sur versionCode du build.gradle)
     private static final String APK_VERSION = String.valueOf(BuildConfig.VERSION_CODE);
 
